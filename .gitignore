@@ -1,0 +1,8 @@
+target/
+logs/
+.DS_Store
+out/
+log/
+lib/
+download.properties
+application.properties

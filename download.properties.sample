@@ -1,0 +1,24 @@
+#test
+#Tue May 27 11:23:36 CEST 2014
+0.AppLoginPostURL=http\://www.example.com/login/loginEmail
+0.AppPassword=password
+0.AppUsername=user@example.com
+0.DownloadURL=http\://www.example.com/printqueue/1
+0.HttpPassword=password
+0.HttpUsername=user
+0.MaxBackups=5
+0.PollInterval=1200
+0.Printer=Officejet_Pro_L7700
+0.ProxyHost=
+0.ProxyPort=
+1.AppLoginPostURL=http\://www.example.com/login/loginEmail
+1.AppPassword=password
+1.AppUsername=user@example.com
+1.DownloadURL=http://www.example.com/
+1.HttpPassword=password
+1.HttpUsername=user
+1.MaxBackups=5
+1.PollInterval=0
+1.Printer=Officejet_Pro_L7700_Special
+1.ProxyHost=
+1.ProxyPort=

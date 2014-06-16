@@ -1,0 +1,4 @@
+http.server.port=8088
+http.server.host=localhost
+http.service.context=trigger
+download.input.file=download.properties
