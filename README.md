@@ -28,11 +28,11 @@ Configuration is meant to be done by knowledgable staff for the time being;-)
 
 Must be available and holds the configuration necessary for trigger requests
 
-<sup>see `application.properties.example` for details<sup>
+<sup>see `application.properties.sample` for details<sup>
 
 `download.properties`
 
-<sup>see `download.properties.example` for details<sup>
+<sup>see `download.properties.sample` for details<sup>
 
 #Example
 
