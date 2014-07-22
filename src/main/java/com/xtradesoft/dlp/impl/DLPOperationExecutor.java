@@ -16,17 +16,17 @@ import com.xtradesoft.dlp.loggable.annotation.Loggable;
 @Loggable(level = Loggable.Level.Debug)
 public class DLPOperationExecutor extends OperationExecutor {
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.base.OperationExecutor#execute(com.xtradesoft.dlp.
-   * base.Operation)
-   */
-  @Override
-  public OperationResult execute(Operation operation) throws Exception {
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.base.OperationExecutor#execute(com.xtradesoft.dlp.
+     * base.Operation)
+     */
+    @Override
+    public OperationResult execute(Operation operation) throws Exception {
 
-    final Context context = getContextprovider().getContext(operation);
-    return operation.execute(context);
-  }
+        final Context context = getContextprovider().getContext(new Object[] { operation, this });
+        return operation.execute(context);
+    }
 
 }

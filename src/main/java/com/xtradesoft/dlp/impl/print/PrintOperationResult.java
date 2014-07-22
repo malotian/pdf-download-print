@@ -11,38 +11,36 @@ import com.xtradesoft.dlp.impl.DLPOperationResult;
  */
 public class PrintOperationResult extends DLPOperationResult {
 
-  /**
-   * The file.
-   */
-  public String file;
+    /** The file. */
+    private final String file;
 
-  /**
-   * The print completed.
-   */
-  public boolean printCompleted;
+    /** The print completed. */
+    private final boolean printCompleted;
 
-  /**
-   * Instantiates a new PrintOperationResult.
-   *
-   * @param file           the file
-   * @param printCompleted the print completed
-   */
-  PrintOperationResult(String file, boolean printCompleted) {
+    /**
+     * Instantiates a new PrintOperationResult.
+     * 
+     * @param file
+     *            the file
+     * @param printCompleted
+     *            the print completed
+     */
+    PrintOperationResult(String file, boolean printCompleted) {
 
-    super();
-    this.file = file;
-    this.printCompleted = printCompleted;
-  }
+        super();
+        this.file = file;
+        this.printCompleted = printCompleted;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.impl.DLPOperationResult#toString()
-   */
-  @Override
-  public String toString() {
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.impl.DLPOperationResult#toString()
+     */
+    @Override
+    public String toString() {
 
-    return String.format("PrintOperationResult: {file:%s, printCompleted:%s,  %s}", file, printCompleted,
-            super.toString());
-  }
+        return String.format("PrintOperationResult: {file:%s, printCompleted:%s,  %s}", file, printCompleted,
+                super.toString());
+    }
 
 }

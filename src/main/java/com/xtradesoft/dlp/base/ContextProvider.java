@@ -9,27 +9,31 @@ package com.xtradesoft.dlp.base;
  */
 public abstract class ContextProvider {
 
-  /**
-   * Gets the context.
-   *
-   * @return the context
-   * @throws Exception the exception
-   */
-  public abstract Context getContext() throws Exception;
+    /**
+     * Gets the context.
+     * 
+     * @return the context
+     * @throws Exception
+     *             the exception
+     */
+    public abstract Context getContext() throws Exception;
 
-  /**
-   * Gets the context.
-   *
-   * @param hint the hint
-   * @return the context
-   * @throws Exception the exception
-   */
-  public abstract Context getContext(Object hint) throws Exception;
+    /**
+     * Gets the context.
+     * 
+     * @param hint
+     *            the hint
+     * @return the context
+     * @throws Exception
+     *             the exception
+     */
+    public abstract Context getContext(Object[] hint) throws Exception;
 
-  /**
-   * Initialize.
-   *
-   * @param configuration the configuration
-   */
-  public abstract void initialize(Configuration configuration);
+    /**
+     * Initialize.
+     * 
+     * @param configuration
+     *            the configuration
+     */
+    public abstract void initialize(Configuration configuration);
 }

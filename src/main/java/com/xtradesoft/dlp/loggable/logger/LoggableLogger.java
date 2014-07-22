@@ -9,26 +9,31 @@ package com.xtradesoft.dlp.loggable.logger;
  */
 public interface LoggableLogger {
 
-  /**
-   * Log.
-   *
-   * @param msg the msg
-   */
-  public void log(String msg);
+    /**
+     * Log.
+     * 
+     * @param msg
+     *            the msg
+     */
+    public void log(String msg);
 
-  /**
-   * Log.
-   *
-   * @param msg    the msg
-   * @param params the params
-   */
-  public void log(String msg, Object... params);
+    /**
+     * Log.
+     * 
+     * @param msg
+     *            the msg
+     * @param params
+     *            the params
+     */
+    public void log(String msg, Object... params);
 
-  /**
-   * Log.
-   *
-   * @param msg       the msg
-   * @param throwable the throwable
-   */
-  public void log(String msg, Throwable throwable);
+    /**
+     * Log.
+     * 
+     * @param msg
+     *            the msg
+     * @param throwable
+     *            the throwable
+     */
+    public void log(String msg, Throwable throwable);
 }

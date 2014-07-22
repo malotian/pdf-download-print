@@ -10,12 +10,13 @@ package com.xtradesoft.dlp.impl.download;
  */
 public interface DownloadObserver {
 
-  /**
-   * This method is called when information about an Download which was
-   * previously requested using an asynchronous interface becomes available.
-   *
-   * @param result the result
-   */
-  public void notify(DowmloadOperationResult result);
+    /**
+     * This method is called when information about an Download which was
+     * previously requested using an asynchronous interface becomes available.
+     * 
+     * @param result
+     *            the result
+     */
+    public void notify(DowmloadOperationResult result);
 
 }

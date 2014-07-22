@@ -11,54 +11,55 @@ import org.slf4j.Logger;
  */
 class DebugLogger extends AbstractLevelLogger {
 
-  /**
-   * Instantiates a new DebugLogger.
-   *
-   * @param classLogger the class logger
-   */
-  public DebugLogger(Logger classLogger) {
+    /**
+     * Instantiates a new DebugLogger.
+     * 
+     * @param classLogger
+     *            the class logger
+     */
+    public DebugLogger(Logger classLogger) {
 
-    super(classLogger);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String)
-   */
-  @Override
-  public void log(String msg) {
-
-    if (classLogger.isDebugEnabled()) {
-      classLogger.debug(msg);
+        super(classLogger);
     }
-  }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String,
-   * java.lang.Object[])
-   */
-  @Override
-  public void log(String msg, Object... params) {
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String)
+     */
+    @Override
+    public void log(String msg) {
 
-    if (classLogger.isDebugEnabled()) {
-      classLogger.debug(msg, params);
+        if (logger().isDebugEnabled()) {
+            logger().debug(msg);
+        }
     }
-  }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String,
-   * java.lang.Throwable)
-   */
-  @Override
-  public void log(String msg, Throwable throwable) {
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String,
+     * java.lang.Object[])
+     */
+    @Override
+    public void log(String msg, Object... params) {
 
-    if (classLogger.isDebugEnabled()) {
-      classLogger.debug(msg, throwable);
+        if (logger().isDebugEnabled()) {
+            logger().debug(msg, params);
+        }
     }
-  }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.loggable.logger.LoggableLogger#log(java.lang.String,
+     * java.lang.Throwable)
+     */
+    @Override
+    public void log(String msg, Throwable throwable) {
+
+        if (logger().isDebugEnabled()) {
+            logger().debug(msg, throwable);
+        }
+    }
 }

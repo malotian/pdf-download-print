@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+
 import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
@@ -42,279 +43,289 @@ import com.xtradesoft.dlp.log.LogRenderer;
  */
 public class DLPApplication implements ConfigurationObserver, DownloadObserver, HttpObserver {
 
-  /**
-   * The Constant logger.
-   */
-  final static Logger logger = LoggerFactory.getLogger(DLPApplication.class);
+    /**
+     * The Class RunnableEx.
+     */
+    private static final class RunnableEx implements Runnable {
 
-  /**
-   * The main method.
-   *
-   * @param args the arguments
-   */
-  public static void main(String[] args) {
+        /*
+         * (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
+        @Override
+        public void run() {
 
-    // overcome race condition on Mac OS X Java
-    SwingUtilities.invokeLater(new Runnable() {
+            final DLPApplication application = new DLPApplication();
+            try {
 
-      @Override
-      public void run() {
+                final DLPConfiguration configuration = new DLPConfiguration();
+                configuration.initialize();
 
-        final DLPApplication application = new DLPApplication();
-        try {
+                if (configuration.validate()) {
+                    application.initialize(configuration);
+                    application.schedule(configuration);
+                }
 
-          final DLPConfiguration configuration = new DLPConfiguration();
-          configuration.initialize();
+            } catch (final Exception e) {
+                LOGGER.error("exception", e);
+            }
 
-          if (configuration.validate()) {
-            application.initialize(configuration);
-            application.schedule(configuration);
-          }
+        }
+    }
 
-        } catch (final Exception e) {
-          logger.error("exception", e);
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DLPApplication.class);
+
+    /**
+     * The main method.
+     * 
+     * @param args
+     *            the arguments
+     */
+    public static void main(String[] args) {
+
+        // overcome race condition on Mac OS X Java
+        SwingUtilities.invokeLater(new RunnableEx());
+
+    }
+
+    /** The context provider. */
+    DLPContextProvider contextProvider;
+
+    /** The executor. */
+    DLPOperationExecutor executor;
+
+    /** The futures. */
+    FutureOperationResults futures;
+
+    /** The tasks. */
+    ScheduleResults tasks;
+
+    /**
+     * Instantiates a new DLPApplication.
+     */
+    public DLPApplication() {
+
+        executor = new DLPOperationExecutor();
+        contextProvider = new DLPContextProvider();
+        executor.register(contextProvider);
+        futures = new FutureOperationResults();
+    }
+
+    /**
+     * Initialize.
+     * 
+     * @param configuration
+     *            the configuration
+     * @throws Exception
+     *             the exception
+     */
+    public void initialize(DLPConfiguration configuration) throws Exception {
+
+        contextProvider.initialize(configuration);
+
+        configuration.register(this);
+
+        final View<Model> configView = new View<Model>();
+
+        configView.initialize(configuration.getModel());
+        configView.showAddDeleteSave();
+
+        new Controller<Model>(configuration.getModel(), configView);
+
+        final DLPMainFrame frame = new DLPMainFrame(new WindowAdapter() {
+
+            @Override
+            public void windowClosed(WindowEvent w) {
+
+                LOGGER.debug("windowClosed");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent w) {
+
+                stop();
+                System.exit(0);
+            }
+        });
+
+        frame.addChild(configView, "config-view");
+
+        final View<Model> logView = new View<Model>();
+        logView.setRenderer(new LogRenderer());
+
+        logView.initialize(LogModel.model());
+
+        new Controller<Model>(LogModel.model(), logView);
+
+        frame.addChild(logView, "log-view");
+
+        frame.sendToTray();
+
+        startHttp();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.base.ConfigurationObserver#notify(com.xtradesoft.dlp
+     * .base.Configuration)
+     */
+    @Override
+    public void notify(Configuration configuration) {
+
+        for (final ScheduleResult task : tasks) {
+            task.future().cancel(true);
         }
 
-      }
-    });
-
-
-  }
-
-  /**
-   * The context provider.
-   */
-  DLPContextProvider _contextProvider;
-
-  /**
-   * The executor.
-   */
-  DLPOperationExecutor _executor;
-
-  /**
-   * The futures.
-   */
-  FutureOperationResults _futures;
-
-  /**
-   * The tasks.
-   */
-  ScheduleResults _tasks;
-
-  /**
-   * Instantiates a new DLPApplication.
-   */
-  public DLPApplication() {
-
-    _executor = new DLPOperationExecutor();
-    _contextProvider = new DLPContextProvider();
-    _executor.register(_contextProvider);
-    _futures = new FutureOperationResults();
-  }
-
-  /**
-   * Initialize.
-   *
-   * @param configuration the configuration
-   * @throws Exception the exception
-   */
-  public void initialize(DLPConfiguration configuration) throws Exception {
-
-    _contextProvider.initialize(configuration);
-
-    configuration.register(this);
-
-    final View<Model> configView = new View<Model>();
-
-    configView.initialize(configuration.getModel());
-    configView.showAddDeleteSave();
-
-    new Controller<Model>(configuration.getModel(), configView);
-
-    final DLPMainFrame frame = new DLPMainFrame(new WindowAdapter() {
-
-      @Override
-      public void windowClosed(WindowEvent w) {
-
-        System.exit(0);
-      }
-
-      @Override
-      public void windowClosing(WindowEvent w) {
-
-        stop();
-      }
-    });
-
-    frame.addChild(configView, "config-view");
-
-    final View<Model> logView = new View<Model>();
-    logView.setRenderer(new LogRenderer());
-
-    logView.initialize(LogModel.model());
-
-    new Controller<Model>(LogModel.model(), logView);
-
-    frame.addChild(logView, "log-view");
-
-    frame.sendToTray();
-
-    startHttp();
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.base.ConfigurationObserver#notify(com.xtradesoft.dlp
-   * .base.Configuration)
-   */
-  @Override
-  public void notify(Configuration configuration) {
-
-    for (final ScheduleResult task : _tasks) {
-      task.future().cancel(true);
+        contextProvider.initialize(configuration);
+        schedule((DLPConfiguration) configuration);
     }
 
-    _contextProvider.initialize(configuration);
-    schedule((DLPConfiguration) configuration);
-  }
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.impl.download.DownloadObserver#notify(com.xtradesoft
+     * .dlp.impl.download.DowmloadOperationResult)
+     */
+    @Override
+    public void notify(DowmloadOperationResult result) {
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.impl.download.DownloadObserver#notify(com.xtradesoft
-   * .dlp.impl.download.DowmloadOperationResult)
-   */
-  @Override
-  public void notify(DowmloadOperationResult result) {
-
-    final PrintOperation operation = new PrintOperation();
-    operation.setURL(result.url);
-    operation.setFile(result.file);
-    _executor.submit(operation);
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.impl.http.HttpObserver#notify(java.util.Map)
-   */
-  @Override
-  public boolean notify(Map<String, String> httpInput) {
-
-    final String url = httpInput.get("print");
-    logger.info("received, download and print request for url: {}", url);
-    try {
-      submit(new URL(url));
-    } catch (final MalformedURLException e) {
-      logger.error("no or invalid url: {}, error: {}", url, e);
-      return false;
+        final PrintOperation operation = new PrintOperation();
+        operation.setURL(result.url());
+        operation.setFile(result.file());
+        executor.submit(operation);
     }
-    return true;
-  }
 
-  /**
-   * Schedule.
-   *
-   * @param configuration the configuration
-   */
-  public void schedule(DLPConfiguration configuration) {
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.impl.http.HttpObserver#notify(java.util.Map)
+     */
+    @Override
+    public boolean notify(Map<String, String> httpInput) {
 
-    final ScheduleResults results = new ScheduleResults();
-    final Rows<Model> rows = new Rows<Model>(configuration.getModel());
-
-    while (rows.hasNext()) {
-      final DLPConfiguration.Record record = new DLPConfiguration.Record(rows.next());
-
-      if (!record.validate()) {
-        continue;
-      }
-      if (record.HasPollInterval() && (record.PollInterval() <= 0)) {
-        logger.info("ignoring polling PollInterval: {} for URL: {}", record.PollInterval(),
-                record.DownloadURL());
-        continue;
-      }
-
-      final ScheduleResult result = schedule(record.DownloadURL(), record.PollInterval());
-      results.add(result);
-      logger.info("scheduled download of URL: {} every {} seconds", record.DownloadURL(),
-              record.PollInterval());
-
+        final String url = httpInput.get("print");
+        LOGGER.info("received, download and print request for url: {}", url);
+        try {
+            submit(new URL(url));
+        } catch (final MalformedURLException e) {
+            LOGGER.error("no or invalid url: {}, error: {}", url, e);
+            return false;
+        }
+        return true;
     }
-    logger.info("downloadables(scheduled), count: {}", results.size());
 
-    _tasks = results.createSynchronized();
-  }
+    /**
+     * Schedule.
+     * 
+     * @param configuration
+     *            the configuration
+     */
+    public void schedule(DLPConfiguration configuration) {
 
-  /**
-   * Schedule.
-   *
-   * @param operation    the operation
-   * @param everySeconds the every seconds
-   * @return the schedule result
-   */
-  public ScheduleResult schedule(Operation operation, int everySeconds) {
+        final ScheduleResults results = new ScheduleResults();
+        final Rows<Model> rows = new Rows<Model>(configuration.getModel());
 
-    final ScheduleResult result = _executor.schedule(operation, everySeconds);
-    return result;
-  }
+        while (rows.hasNext()) {
+            final DLPConfiguration.Record record = new DLPConfiguration.Record(rows.next());
 
-  /**
-   * Schedule.
-   *
-   * @param url          the url
-   * @param everySeconds the every seconds
-   * @return the schedule result
-   */
-  public ScheduleResult schedule(URL url, int everySeconds) {
+            if (!record.validate()) {
+                continue;
+            }
 
-    final DownloadOperation operation = new DownloadOperation(url);
-    operation.register(this);
-    return schedule(operation, everySeconds);
-  }
+            if (record.HasPollInterval() && record.PollInterval() <= 0) {
+                LOGGER.info("ignoring polling PollInterval: {} for URL: {}", record.PollInterval(),
+                        record.DownloadURL());
+            } else {
 
-  /**
-   * Start http.
-   *
-   * @return the future operation result
-   */
-  public FutureOperationResult startHttp() {
+                final ScheduleResult result = schedule(record.DownloadURL(), record.PollInterval());
+                results.add(result);
+                LOGGER.info("scheduled download of URL: {} every {} seconds", record.DownloadURL(),
+                        record.PollInterval());
+            }
 
-    return submit(new HttpStartOperation(this));
-  }
+        }
+        LOGGER.info("downloadables(scheduled), count: {}", results.size());
 
-  /**
-   * Stop.
-   */
-  public void stop() {
+        tasks = results.createSynchronized();
+    }
 
-    _executor.cancelAll();
-    _executor.shutdown();
-  }
+    /**
+     * Schedule.
+     * 
+     * @param operation
+     *            the operation
+     * @param everySeconds
+     *            the every seconds
+     * @return the schedule result
+     */
+    public ScheduleResult schedule(Operation operation, int everySeconds) {
 
-  /**
-   * Submit.
-   *
-   * @param operation the operation
-   * @return the future operation result
-   */
-  public FutureOperationResult submit(Operation operation) {
+        return executor.schedule(operation, everySeconds);
+    }
 
-    final FutureOperationResult future = _executor.submit(operation);
-    _futures.add(future);
-    return future;
-  }
+    /**
+     * Schedule.
+     * 
+     * @param url
+     *            the url
+     * @param everySeconds
+     *            the every seconds
+     * @return the schedule result
+     */
+    public ScheduleResult schedule(URL url, int everySeconds) {
 
-  /**
-   * Submit.
-   *
-   * @param url the url
-   * @return the future operation result
-   */
-  public FutureOperationResult submit(URL url) {
+        final DownloadOperation operation = new DownloadOperation(url);
+        operation.register(this);
+        return schedule(operation, everySeconds);
+    }
 
-    final DownloadOperation operation = new DownloadOperation(url);
-    operation.register(this);
-    return submit(operation);
-  }
+    /**
+     * Start http.
+     * 
+     * @return the future operation result
+     */
+    public FutureOperationResult startHttp() {
+
+        return submit(new HttpStartOperation(this));
+    }
+
+    /**
+     * Stop.
+     */
+    public void stop() {
+
+        executor.cancelAll();
+        executor.shutdown();
+        executor = null;
+    }
+
+    /**
+     * Submit.
+     * 
+     * @param operation
+     *            the operation
+     * @return the future operation result
+     */
+    public FutureOperationResult submit(Operation operation) {
+
+        final FutureOperationResult future = executor.submit(operation);
+        futures.add(future);
+        return future;
+    }
+
+    /**
+     * Submit.
+     * 
+     * @param url
+     *            the url
+     * @return the future operation result
+     */
+    public FutureOperationResult submit(URL url) {
+
+        final DownloadOperation operation = new DownloadOperation(url);
+        operation.register(this);
+        return submit(operation);
+    }
 
 }

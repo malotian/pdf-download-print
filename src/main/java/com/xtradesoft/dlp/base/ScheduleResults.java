@@ -14,31 +14,32 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class ScheduleResults extends ArrayList<ScheduleResult> {
 
-  /**
-   * Instantiates a new ScheduleResults.
-   */
-  public ScheduleResults() {
+    /**
+     * Instantiates a new ScheduleResults.
+     */
+    public ScheduleResults() {
 
-  }
+    }
 
-  /**
-   * Instantiates a new ScheduleResults.
-   *
-   * @param results the results
-   */
-  private ScheduleResults(List<ScheduleResult> results) {
+    /**
+     * Instantiates a new ScheduleResults.
+     * 
+     * @param results
+     *            the results
+     */
+    private ScheduleResults(List<ScheduleResult> results) {
 
-    super(results);
-  }
+        super(results);
+    }
 
-  /**
-   * Creates the synchronized.
-   *
-   * @return the schedule results
-   */
-  public ScheduleResults createSynchronized() {
+    /**
+     * Creates the synchronized.
+     * 
+     * @return the schedule results
+     */
+    public ScheduleResults createSynchronized() {
 
-    return new ScheduleResults(Collections.synchronizedList(this));
+        return new ScheduleResults(Collections.synchronizedList(this));
 
-  }
+    }
 }

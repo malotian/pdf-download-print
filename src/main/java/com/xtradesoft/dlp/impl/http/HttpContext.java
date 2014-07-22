@@ -4,6 +4,8 @@
 
 package com.xtradesoft.dlp.impl.http;
 
+import java.util.concurrent.Executor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,117 +18,139 @@ import com.xtradesoft.dlp.loggable.annotation.Loggable;
  */
 public class HttpContext extends Context {
 
-  /**
-   * The Constant logger.
-   */
-  final static Logger logger = LoggerFactory.getLogger(HttpContext.class);
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpContext.class);
 
-  /**
-   * The host.
-   */
-  private String _host = "";
+    /** The executor. */
+    private Executor executor;
 
-  /**
-   * The port.
-   */
-  private int _port = -1;
+    /** The host. */
+    private String host = "";
 
-  /**
-   * The service context.
-   */
-  private String _serviceContext = "";
+    /** The port. */
+    private int port = -1;
 
-  /**
-   * Instantiates a new HttpContext.
-   */
-  public HttpContext() {
+    /** The service context. */
+    private String serviceContext = "";
 
-  }
+    /**
+     * Instantiates a new HttpContext.
+     */
+    public HttpContext() {
 
-  /**
-   * Gets the host.
-   *
-   * @return the host
-   */
-  public String getHost() {
-
-    return _host;
-  }
-
-  /**
-   * Gets the port.
-   *
-   * @return the port
-   */
-  public int getPort() {
-
-    return _port;
-  }
-
-  /**
-   * Gets the service context.
-   *
-   * @return the service context
-   */
-  public String getServiceContext() {
-
-    return _serviceContext;
-  }
-
-  /**
-   * Checks for host.
-   *
-   * @return true, if successful
-   */
-  boolean hasHost() {
-
-    return !_host.isEmpty();
-  }
-
-  /**
-   * Initialize.
-   *
-   * @return the http context
-   * @throws DLPException the DLP exception
-   */
-  @Loggable(level = Loggable.Level.Debug)
-  public HttpContext initialize() throws DLPException {
-
-    if ((null != _serviceContext) && !_serviceContext.isEmpty() && !_serviceContext.startsWith("/")) {
-      _serviceContext = "/" + _serviceContext;
     }
 
-    return this;
-  }
+    /**
+     * Gets the executor.
+     * 
+     * @return the executor
+     */
+    public Executor getExecutor() {
 
-  /**
-   * Sets the host.
-   *
-   * @param _host the new host
-   */
-  public void setHost(String _host) {
+        return executor;
+    }
 
-    this._host = _host;
-  }
+    /**
+     * Gets the host.
+     * 
+     * @return the host
+     */
+    public String getHost() {
 
-  /**
-   * Sets the port.
-   *
-   * @param port the new port
-   */
-  public void setPort(int port) {
+        return host;
+    }
 
-    _port = port;
-  }
+    /**
+     * Gets the port.
+     * 
+     * @return the port
+     */
+    public int getPort() {
 
-  /**
-   * Sets the service context.
-   *
-   * @param serviceContext the new service context
-   */
-  public void setServiceContext(String serviceContext) {
+        return port;
+    }
 
-    _serviceContext = serviceContext;
-  }
+    /**
+     * Gets the service context.
+     * 
+     * @return the service context
+     */
+    public String getServiceContext() {
+
+        return serviceContext;
+    }
+
+    /**
+     * Checks for host.
+     * 
+     * @return true, if successful
+     */
+    boolean hasHost() {
+
+        return !host.isEmpty();
+    }
+
+    /**
+     * Initialize.
+     * 
+     * @return the http context
+     * @throws DLPException
+     *             the DLP exception
+     */
+    @Loggable(level = Loggable.Level.Debug)
+    public HttpContext initialize() throws DLPException {
+
+        if (null != serviceContext && !serviceContext.isEmpty() && !serviceContext.startsWith("/")) {
+            serviceContext = "/" + serviceContext;
+        }
+
+        LOGGER.debug("initilaized, serviceContext: " + serviceContext);
+
+        return this;
+    }
+
+    /**
+     * Sets the executor.
+     * 
+     * @param executor
+     *            the new executor
+     */
+    public void setExecutor(Executor executor) {
+
+        this.executor = executor;
+    }
+
+    /**
+     * Sets the host.
+     * 
+     * @param host
+     *            the new host
+     */
+    public void setHost(String host) {
+
+        this.host = host;
+    }
+
+    /**
+     * Sets the port.
+     * 
+     * @param port
+     *            the new port
+     */
+    public void setPort(int port) {
+
+        this.port = port;
+    }
+
+    /**
+     * Sets the service context.
+     * 
+     * @param serviceContext
+     *            the new service context
+     */
+    public void setServiceContext(String serviceContext) {
+
+        this.serviceContext = serviceContext;
+    }
 
 }

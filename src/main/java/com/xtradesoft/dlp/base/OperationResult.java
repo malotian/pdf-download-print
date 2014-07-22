@@ -9,83 +9,82 @@ package com.xtradesoft.dlp.base;
  */
 public class OperationResult {
 
-  /**
-   * The error.
-   */
-  OperationError<Error> _error;
+    /** The error. */
+    OperationError<Error> error;
 
-  /**
-   * The operation.
-   */
-  Operation _operation;
+    /** The operation. */
+    Operation operation;
 
-  /**
-   * Instantiates a new OperationResult.
-   */
-  public OperationResult() {
+    /**
+     * Instantiates a new OperationResult.
+     */
+    public OperationResult() {
 
-  }
+    }
 
-  /**
-   * Instantiates a new OperationResult.
-   *
-   * @param error the error
-   */
-  public OperationResult(Error error) {
+    /**
+     * Instantiates a new OperationResult.
+     * 
+     * @param error
+     *            the error
+     */
+    public OperationResult(Error error) {
 
-    _error = new OperationError<Error>(error);
-  }
+        this.error = new OperationError<Error>(error);
+    }
 
-  /**
-   * Instantiates a new OperationResult.
-   *
-   * @param error the error
-   */
-  public OperationResult(OperationError<Error> error) {
+    /**
+     * Instantiates a new OperationResult.
+     * 
+     * @param error
+     *            the error
+     */
+    public OperationResult(OperationError<Error> error) {
 
-    _error = error;
-  }
+        this.error = error;
+    }
 
-  /**
-   * Checks for got error.
-   *
-   * @return true, if successful
-   */
-  boolean hasGotError() {
+    /**
+     * Checks for got error.
+     * 
+     * @return true, if successful
+     */
+    boolean hasGotError() {
 
-    return null != _error;
-  }
+        return null != error;
+    }
 
-  /**
-   * Result of.
-   *
-   * @return the operation
-   */
-  public Operation resultOf() {
+    /**
+     * Result of.
+     * 
+     * @return the operation
+     */
+    public Operation resultOf() {
 
-    return _operation;
-  }
+        return operation;
+    }
 
-  /**
-   * Sets the.
-   *
-   * @param operation the operation
-   * @return the operation result
-   */
-  public OperationResult set(Operation operation) {
+    /**
+     * Sets the.
+     * 
+     * @param operation
+     *            the operation
+     * @return the operation result
+     */
+    public OperationResult set(Operation operation) {
 
-    _operation = operation;
-    return this;
-  }
+        this.operation = operation;
+        return this;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
 
-    return String.format("OperationResult: {%s, error: %s}", _operation, (null == _error) ? null : _error.error());
-  }
+        return String.format("OperationResult: {%s, error: %s}", operation, null == error ? null : error.error());
+    }
 
 }

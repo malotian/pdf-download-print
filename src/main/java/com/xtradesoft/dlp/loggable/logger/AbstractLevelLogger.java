@@ -11,19 +11,28 @@ import org.slf4j.Logger;
  */
 abstract class AbstractLevelLogger implements LoggableLogger {
 
-  /**
-   * The class logger.
-   */
-  protected final Logger classLogger;
+    /** The class logger. */
+    private final Logger classLogger;
 
-  /**
-   * Instantiates a new AbstractLevelLogger.
-   *
-   * @param classLogger the class logger
-   */
-  public AbstractLevelLogger(Logger classLogger) {
+    /**
+     * Instantiates a new AbstractLevelLogger.
+     * 
+     * @param classLogger
+     *            the class logger
+     */
+    public AbstractLevelLogger(Logger classLogger) {
 
-    this.classLogger = classLogger;
-  }
+        this.classLogger = classLogger;
+    }
+
+    /**
+     * Logger.
+     * 
+     * @return the logger
+     */
+    public Logger logger() {
+
+        return classLogger;
+    }
 
 }

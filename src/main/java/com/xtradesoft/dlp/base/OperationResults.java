@@ -12,45 +12,44 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class OperationResults extends ArrayList<OperationResult> {
 
-  /**
-   * The error.
-   */
-  private Error _error;
+    /** The error. */
+    private Error error;
 
-  /**
-   * Instantiates a new OperationResults.
-   */
-  public OperationResults() {
+    /**
+     * Instantiates a new OperationResults.
+     */
+    public OperationResults() {
 
-  }
+    }
 
-  /**
-   * Instantiates a new OperationResults.
-   *
-   * @param error the error
-   */
-  public OperationResults(Error error) {
+    /**
+     * Instantiates a new OperationResults.
+     * 
+     * @param error
+     *            the error
+     */
+    public OperationResults(Error error) {
 
-    _error = error;
-  }
+        this.error = error;
+    }
 
-  /**
-   * Error.
-   *
-   * @return the error
-   */
-  public Error error() {
+    /**
+     * Error.
+     * 
+     * @return the error
+     */
+    public Error error() {
 
-    return _error;
-  }
+        return error;
+    }
 
-  /**
-   * Checks for got error.
-   *
-   * @return true, if successful
-   */
-  boolean hasGotError() {
+    /**
+     * Checks for got error.
+     * 
+     * @return true, if successful
+     */
+    boolean hasGotError() {
 
-    return null != _error;
-  }
+        return null != error;
+    }
 }

@@ -16,52 +16,51 @@ import com.xtradesoft.dlp.loggable.annotation.Loggable;
  */
 public class DLPOperation extends Operation {
 
-  /**
-   * The url.
-   */
-  private URL _url;
+    /** The url. */
+    private URL url;
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.base.Operation#execute(com.xtradesoft.dlp.base.Context
-   * )
-   */
-  @Override
-  @Loggable(level = Loggable.Level.Debug)
-  public OperationResult execute(Context context) throws Exception {
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.base.Operation#execute(com.xtradesoft.dlp.base.Context
+     * )
+     */
+    @Override
+    @Loggable(level = Loggable.Level.Debug)
+    public OperationResult execute(Context context) throws Exception {
 
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Gets the url.
-   *
-   * @return the url
-   */
-  public URL getURL() {
+    /**
+     * Gets the url.
+     * 
+     * @return the url
+     */
+    public URL getURL() {
 
-    return _url;
-  }
+        return url;
+    }
 
-  /**
-   * Sets the url.
-   *
-   * @param url the new url
-   */
-  public void setURL(URL url) {
+    /**
+     * Sets the url.
+     * 
+     * @param url
+     *            the new url
+     */
+    public void setURL(URL url) {
 
-    _url = url;
-  }
+        this.url = url;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.base.Operation#toString()
-   */
-  @Override
-  public String toString() {
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.base.Operation#toString()
+     */
+    @Override
+    public String toString() {
 
-    return String.format("DLPOperation: {URL: %s, %s}", getURL(), super.toString());
+        return String.format("DLPOperation: {URL: %s, %s}", getURL(), super.toString());
 
-  }
+    }
 }

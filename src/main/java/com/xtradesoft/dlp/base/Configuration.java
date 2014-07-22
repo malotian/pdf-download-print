@@ -12,38 +12,38 @@ import java.util.List;
  */
 public abstract class Configuration {
 
-  /**
-   * The observers.
-   */
-  List<ConfigurationObserver> _observers = new ArrayList<ConfigurationObserver>();
+    /** The observers. */
+    List<ConfigurationObserver> observers = new ArrayList<ConfigurationObserver>();
 
-  /**
-   * Notify observers.
-   */
-  public void notifyObservers() {
+    /**
+     * Notify observers.
+     */
+    public void notifyObservers() {
 
-    for (final ConfigurationObserver observer : _observers) {
-      observer.notify(this);
+        for (final ConfigurationObserver observer : observers) {
+            observer.notify(this);
+        }
     }
-  }
 
-  /**
-   * Register.
-   *
-   * @param observer the observer
-   */
-  public void register(ConfigurationObserver observer) {
+    /**
+     * Register.
+     * 
+     * @param observer
+     *            the observer
+     */
+    public void register(ConfigurationObserver observer) {
 
-    _observers.add(observer);
-  }
+        observers.add(observer);
+    }
 
-  /**
-   * Unregister.
-   *
-   * @param observer the observer
-   */
-  public void unregister(ConfigurationObserver observer) {
+    /**
+     * Unregister.
+     * 
+     * @param observer
+     *            the observer
+     */
+    public void unregister(ConfigurationObserver observer) {
 
-    _observers.remove(observer);
-  }
+        observers.remove(observer);
+    }
 }

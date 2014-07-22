@@ -12,36 +12,34 @@ import com.xtradesoft.dlp.base.tablemvc.Model;
 @SuppressWarnings("serial")
 public class LogModel extends Model {
 
-  /**
-   * The singleton.
-   */
-  private static LogModel singleton;
+    /** The singleton. */
+    private static LogModel singleton;
 
-  static {
-    singleton = new LogModel();
-    LogAppender.setModel(singleton);
+    static {
+        singleton = new LogModel();
+        LogAppender.setModel(singleton);
 
-  }
+    }
 
-  /**
-   * Model.
-   *
-   * @return the log model
-   */
-  public static LogModel model() {
+    /**
+     * Model.
+     * 
+     * @return the log model
+     */
+    public static LogModel model() {
 
-    return singleton;
-  }
+        return singleton;
+    }
 
-  /**
-   * Instantiates a new LogModel.
-   */
-  private LogModel() {
+    /**
+     * Instantiates a new LogModel.
+     */
+    private LogModel() {
 
-    super();
-    addColumn("Level");
-    addColumn("Timestamp");
-    addColumn("Message");
-  }
+        super();
+        addColumn("Level");
+        addColumn("Timestamp");
+        addColumn("Message");
+    }
 
 }

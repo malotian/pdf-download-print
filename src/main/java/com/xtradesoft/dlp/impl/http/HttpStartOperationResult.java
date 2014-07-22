@@ -4,6 +4,7 @@
 
 package com.xtradesoft.dlp.impl.http;
 
+import com.sun.net.httpserver.HttpServer;
 import com.xtradesoft.dlp.base.OperationResult;
 
 /**
@@ -11,19 +12,21 @@ import com.xtradesoft.dlp.base.OperationResult;
  */
 public class HttpStartOperationResult extends OperationResult {
 
-  /**
-   * The started.
-   */
-  boolean _started;
+    /** The started. */
+    boolean started;
 
-  /**
-   * Instantiates a new HttpStartOperationResult.
-   *
-   * @param started the started
-   */
-  HttpStartOperationResult(boolean started) {
+    final HttpServer server;
 
-    _started = started;
-  }
+    /**
+     * Instantiates a new HttpStartOperationResult.
+     * 
+     * @param started
+     *            the started
+     */
+    HttpStartOperationResult(boolean started, HttpServer server) {
+
+        this.server = server;
+        this.started = started;
+    }
 
 }

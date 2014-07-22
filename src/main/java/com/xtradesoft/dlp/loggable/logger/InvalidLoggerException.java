@@ -10,38 +10,42 @@ package com.xtradesoft.dlp.loggable.logger;
 @SuppressWarnings("serial")
 class InvalidLoggerException extends RuntimeException {
 
-  /**
-   * Instantiates a new InvalidLoggerException.
-   *
-   * @param message the message
-   */
-  public InvalidLoggerException(String message) {
+    /**
+     * Instantiates a new InvalidLoggerException.
+     * 
+     * @param message
+     *            the message
+     */
+    public InvalidLoggerException(String message) {
 
-    super(message);
+        super(message);
 
-  }
+    }
 
-  /**
-   * Instantiates a new InvalidLoggerException.
-   *
-   * @param message the message
-   * @param cause   the cause
-   */
-  public InvalidLoggerException(String message, Throwable cause) {
+    /**
+     * Instantiates a new InvalidLoggerException.
+     * 
+     * @param message
+     *            the message
+     * @param cause
+     *            the cause
+     */
+    public InvalidLoggerException(String message, Throwable cause) {
 
-    super(message, cause);
+        super(message, cause);
 
-  }
+    }
 
-  /**
-   * Instantiates a new InvalidLoggerException.
-   *
-   * @param cause the cause
-   */
-  public InvalidLoggerException(Throwable cause) {
+    /**
+     * Instantiates a new InvalidLoggerException.
+     * 
+     * @param cause
+     *            the cause
+     */
+    public InvalidLoggerException(Throwable cause) {
 
-    super(cause);
+        super(cause);
 
-  }
+    }
 
 }

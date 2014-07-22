@@ -11,74 +11,73 @@ import java.util.concurrent.ScheduledFuture;
  */
 public class ScheduleResult {
 
-  /**
-   * The error.
-   */
-  private Error _error;
+    /** The error. */
+    private Error error;
 
-  /**
-   * The future.
-   */
-  ScheduledFuture<?> _future;
+    /** The future. */
+    ScheduledFuture<?> future;
 
-  /**
-   * Instantiates a new ScheduleResult.
-   *
-   * @param error the error
-   */
-  ScheduleResult(Error error) {
+    /**
+     * Instantiates a new ScheduleResult.
+     * 
+     * @param error
+     *            the error
+     */
+    ScheduleResult(Error error) {
 
-    _error = error;
-  }
+        this.error = error;
+    }
 
-  /**
-   * Instantiates a new ScheduleResult.
-   *
-   * @param future the future
-   */
-  ScheduleResult(ScheduledFuture<?> future) {
+    /**
+     * Instantiates a new ScheduleResult.
+     * 
+     * @param future
+     *            the future
+     */
+    ScheduleResult(ScheduledFuture<?> future) {
 
-    _future = future;
-  }
+        this.future = future;
+    }
 
-  /**
-   * Future.
-   *
-   * @return the scheduled future
-   */
-  public ScheduledFuture<?> future() {
+    /**
+     * Future.
+     * 
+     * @return the scheduled future
+     */
+    public ScheduledFuture<?> future() {
 
-    return _future;
-  }
+        return future;
+    }
 
-  /**
-   * Gets the error.
-   *
-   * @return the error
-   */
-  public Error getError() {
+    /**
+     * Gets the error.
+     * 
+     * @return the error
+     */
+    public Error getError() {
 
-    return _error;
-  }
+        return error;
+    }
 
-  /**
-   * Checks for got error.
-   *
-   * @return true, if successful
-   */
-  boolean hasGotError() {
+    /**
+     * Checks for got error.
+     * 
+     * @return true, if successful
+     */
+    boolean hasGotError() {
 
-    return null != _error;
-  }
+        return null != error;
+    }
 
-  /**
-   * Sets the error.
-   *
-   * @param error the new error
-   */
-  public void setError(Error error) {
+    /**
+     * Sets the error.
+     * 
+     * @param error
+     *            the new error
+     */
+    public void setError(Error error) {
 
-    _error = error;
-  }
+        this.error = error;
+    }
 
 }

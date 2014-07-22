@@ -22,126 +22,124 @@ import com.xtradesoft.dlp.impl.DLPOperation;
  */
 public class DownloadOperation extends DLPOperation {
 
-  /**
-   * The Constant logger.
-   */
-  final static Logger logger = LoggerFactory.getLogger(DownloadOperation.class);
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadOperation.class);
 
-  /**
-   * The observer.
-   */
-  private DownloadObserver _observer;
+    /** The observer. */
+    private DownloadObserver observer;
 
-  /**
-   * The roller.
-   */
-  public FileRoller _roller;
+    /** The roller. */
+    private final FileRoller roller;
 
-  /**
-   * Instantiates a new DownloadOperation.
-   *
-   * @param url the url
-   */
-  public DownloadOperation(URL url) {
+    /**
+     * Instantiates a new DownloadOperation.
+     * 
+     * @param url
+     *            the url
+     */
+    public DownloadOperation(URL url) {
 
-    setURL(url);
-    _roller = new FileRoller(getBaseFileName());
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.impl.DLPOperation#execute(com.xtradesoft.dlp.base.
-   * Context)
-   */
-  @Override
-  public OperationResult execute(Context context) throws Exception {
-
-    final DownloadContext dlContext = (DownloadContext) context;
-
-    logger.debug("application login required: {}", dlContext.applicationLoginRequired());
-
-    if (dlContext.applicationLoginRequired()) {
-      login(dlContext);
+        setURL(url);
+        roller = new FileRoller(getBaseFileName());
     }
 
-    final File file = _roller.roll(dlContext.getMaxBackUps());
-    final DowmloadOperationResult result = new DowmloadOperationResult(dlContext.getURL(), file.getName());
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.impl.DLPOperation#execute(com.xtradesoft.dlp.base.
+     * Context)
+     */
+    @Override
+    public OperationResult execute(Context context) throws Exception {
 
-    logger.debug("HttpGet: {}", dlContext.HttpGet());
-    dlContext.getExecutor().execute(dlContext.HttpGet()).saveContent(file);
-    logger.info("success, HttpGet: {}, Response saved to file: {}", dlContext.HttpGet(), file.getAbsolutePath());
+        final DownloadContext dlContext = (DownloadContext) context;
 
-    logger.debug("notify, downloaded completion - file: {}", file);
-    getObserver().notify(result);
-    logger.debug("notified, downloaded completion - file: {}", file);
+        LOGGER.debug("application login required: {}", dlContext.applicationLoginRequired());
 
-    return result;
-  }
+        if (dlContext.applicationLoginRequired()) {
+            login(dlContext);
+        }
 
-  /**
-   * Gets the base file name.
-   *
-   * @return the base file name
-   */
-  protected String getBaseFileName() {
+        final File file = roller.roll(dlContext.getMaxBackUps());
+        final DowmloadOperationResult result = new DowmloadOperationResult(dlContext.getURL(), file.getName());
 
-    String baseFile = getURL().getPath().substring(getURL().getPath().lastIndexOf('/') + 1);
+        LOGGER.debug("HttpGet: {}", dlContext.httpGet());
+        dlContext.getExecutor().execute(dlContext.httpGet()).saveContent(file);
+        LOGGER.info("success, HttpGet: {}, Response saved to file: {}", dlContext.httpGet(), file.getAbsolutePath());
 
-    if (!baseFile.endsWith(".pdf")) {
-      baseFile += ".pdf";
+        LOGGER.debug("notify, downloaded completion - file: {}", file);
+        getObserver().notify(result);
+        LOGGER.debug("notified, downloaded completion - file: {}", file);
+
+        return result;
     }
 
-    return baseFile;
-  }
+    /**
+     * Gets the base file name.
+     * 
+     * @return the base file name
+     */
+    protected String getBaseFileName() {
 
-  /**
-   * Gets the observer.
-   *
-   * @return the observer
-   */
-  public DownloadObserver getObserver() {
+        String baseFile = getURL().getPath().substring(getURL().getPath().lastIndexOf('/') + 1);
 
-    return _observer;
-  }
+        if (!baseFile.endsWith(".pdf")) {
+            baseFile += ".pdf";
+        }
 
-  /**
-   * Login.
-   *
-   * @param dlContext the dl context
-   * @return true, if successful
-   * @throws Exception the exception
-   */
-  boolean login(DownloadContext dlContext) throws Exception {
+        return baseFile;
+    }
 
-    logger.info("HttpApplicationLogin.Request: {}", dlContext.HttpApplicationLogin());
-    final Response response = dlContext.getExecutor().execute(dlContext.HttpApplicationLogin());
-    final HttpResponse httpResponse = response.returnResponse();
-    logger.debug("HttpApplicationLogin.Response: {}", httpResponse);
-    logger.debug("HttpApplicationLogin.Response, location-header: {}", httpResponse.getFirstHeader("location")
-            .getValue());
+    /**
+     * Gets the observer.
+     * 
+     * @return the observer
+     */
+    public DownloadObserver getObserver() {
 
-    return true;
-  }
+        return observer;
+    }
 
-  /**
-   * Register.
-   *
-   * @param observer the observer
-   */
-  public void register(DownloadObserver observer) {
+    /**
+     * Login.
+     * 
+     * @param dlContext
+     *            the dl context
+     * @return true, if successful
+     * @throws Exception
+     *             the exception
+     */
+    boolean login(DownloadContext dlContext) throws Exception {
 
-    _observer = observer;
-  }
+        LOGGER.info("HttpApplicationLogin.Request: {}", dlContext.httpApplicationLogin());
+        final Response response = dlContext.getExecutor().execute(dlContext.httpApplicationLogin());
+        final HttpResponse httpResponse = response.returnResponse();
+        LOGGER.debug("HttpApplicationLogin.Response: {}", httpResponse);
+        LOGGER.debug("HttpApplicationLogin.Response, location-header: {}", httpResponse.getFirstHeader("location")
+                .getValue());
 
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.impl.DLPOperation#toString()
-   */
-  @Override
-  public String toString() {
+        return true;
+    }
 
-    return String.format("DownloadOperation: {%s}", super.toString());
+    /**
+     * Register.
+     * 
+     * @param observer
+     *            the observer
+     */
+    public void register(DownloadObserver observer) {
 
-  }
+        this.observer = observer;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.impl.DLPOperation#toString()
+     */
+    @Override
+    public String toString() {
+
+        return String.format("DownloadOperation: {%s}", super.toString());
+
+    }
 }

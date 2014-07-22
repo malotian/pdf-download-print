@@ -30,235 +30,273 @@ import com.xtradesoft.dlp.impl.DLPOperation;
  */
 public class PrintOperation extends DLPOperation {
 
-  /**
-   * The Class PrintJobWatcher.
-   */
-  public class PrintJobWatcher {
-
     /**
-     * The done.
+     * The Class PrintJobWatcher.
      */
-    private boolean _done = false;
+    public class PrintJobWatcher {
 
-    /**
-     * The print job completed.
-     */
-    public boolean _printJobCompleted;
+        /**
+         * The Class PrintJobAdapterEx.
+         */
+        private final class PrintJobAdapterEx extends PrintJobAdapter {
 
-    /**
-     * Instantiates a new PrintJobWatcher.
-     *
-     * @param job the job
-     */
-    public PrintJobWatcher(final DocPrintJob job) {
+            /** The job. */
+            private final DocPrintJob job;
 
-      job.addPrintJobListener(new PrintJobAdapter() {
+            /**
+             * Instantiates a new PrintJobAdapterEx.
+             * 
+             * @param job
+             *            the job
+             */
+            private PrintJobAdapterEx(DocPrintJob job) {
 
-        void done() {
+                this.job = job;
+            }
 
-          synchronized (PrintJobWatcher.this) {
-            setDone(true);
-            PrintJobWatcher.this.notify();
-          }
+            /**
+             * Done.
+             */
+            void done() {
+
+                synchronized (PrintJobWatcher.this) {
+                    setDone(true);
+                    PrintJobWatcher.this.notify();
+                }
+            }
+
+            /* 
+             * (non-Javadoc)
+             * @see javax.print.event.PrintJobAdapter#printJobCanceled(javax.print.event.PrintJobEvent)
+             */
+            @Override
+            public void printJobCanceled(PrintJobEvent pje) {
+
+                LOGGER.warn("failure, canceled print: {}, at printer: {}", getFile(), job.getPrintService());
+                done();
+            }
+
+            /* 
+             * (non-Javadoc)
+             * @see javax.print.event.PrintJobAdapter#printJobCompleted(javax.print.event.PrintJobEvent)
+             */
+            @Override
+            public void printJobCompleted(PrintJobEvent pje) {
+
+                LOGGER.info("success, completed print: {}, at printer: {}", getFile(), job.getPrintService());
+                setPrintJobCompleted(true);
+                done();
+            }
+
+            /* 
+             * (non-Javadoc)
+             * @see javax.print.event.PrintJobAdapter#printJobFailed(javax.print.event.PrintJobEvent)
+             */
+            @Override
+            public void printJobFailed(PrintJobEvent pje) {
+
+                LOGGER.error("failure, failed print: {}, at printer: {}", getFile(), job.getPrintService());
+                done();
+            }
+
+            /* 
+             * (non-Javadoc)
+             * @see javax.print.event.PrintJobAdapter#printJobNoMoreEvents(javax.print.event.PrintJobEvent)
+             */
+            @Override
+            public void printJobNoMoreEvents(PrintJobEvent pje) {
+
+                LOGGER.info("assume, completed print: {}, at printer: {}", getFile(), job.getPrintService());
+                done();
+            }
         }
 
-        @Override
-        public void printJobCanceled(PrintJobEvent pje) {
+        /** The done. */
+        private boolean done = false;
 
-          logger.warn("failure, canceled print: {}, at printer: {}", getFile(), job.getPrintService());
-          done();
+        /** The print job completed. */
+        private boolean printJobCompleted;
+
+        /**
+         * Instantiates a new PrintJobWatcher.
+         * 
+         * @param job
+         *            the job
+         */
+        public PrintJobWatcher(final DocPrintJob job) {
+
+            job.addPrintJobListener(new PrintJobAdapterEx(job));
         }
 
-        @Override
-        public void printJobCompleted(PrintJobEvent pje) {
+        /**
+         * Checks if is the done.
+         * 
+         * @return the done
+         */
+        public boolean isDone() {
 
-          logger.info("success, completed print: {}, at printer: {}", getFile(), job.getPrintService());
-          setPrintJobCompleted(true);
-          done();
+            return done;
         }
 
-        @Override
-        public void printJobFailed(PrintJobEvent pje) {
+        /**
+         * Checks if is the print job completed.
+         * 
+         * @return the print job completed
+         */
+        public boolean isPrintJobCompleted() {
 
-          logger.error("failure, failed print: {}, at printer: {}", getFile(), job.getPrintService());
-          done();
+            return printJobCompleted;
         }
 
-        @Override
-        public void printJobNoMoreEvents(PrintJobEvent pje) {
+        /**
+         * Sets the done.
+         * 
+         * @param done
+         *            the new done
+         */
+        public void setDone(boolean done) {
 
-          logger.info("assume, completed print: {}, at printer: {}", getFile(), job.getPrintService());
-          done();
+            this.done = done;
         }
-      });
+
+        /**
+         * Sets the print job completed.
+         * 
+         * @param printJobCompleted
+         *            the new print job completed
+         */
+        public void setPrintJobCompleted(boolean printJobCompleted) {
+
+            this.printJobCompleted = printJobCompleted;
+        }
+
+        /**
+         * Wait for done.
+         * 
+         * @return true, if successful
+         */
+        public synchronized boolean waitForDone() {
+
+            try {
+                while (!isDone()) {
+                    wait();
+                }
+
+            } catch (final InterruptedException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            return isPrintJobCompleted();
+        }
+    }
+
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PrintOperation.class);
+
+    /** The file. */
+    private String file;
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * com.xtradesoft.dlp.impl.DLPOperation#execute(com.xtradesoft.dlp.base.
+     * Context)
+     */
+    @Override
+    public OperationResult execute(Context context) throws Exception {
+
+        if (null != System.getProperty("ShowPrintDialog")) {
+            return executeEx(context);
+        }
+
+        final PrintContext printContext = (PrintContext) context;
+
+        PDDocument document = null;
+        boolean printCompleted = false;
+        try {
+            LOGGER.debug("load: {}", getFile());
+            document = PDDocument.load(getFile());
+            final SimpleDoc printable = new SimpleDoc(document, DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
+            final DocPrintJob printJob = printContext.getService().createPrintJob();
+            final PrintJobWatcher watcher = new PrintJobWatcher(printJob);
+            final PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
+            attrs.add(new JobName(getFile(), Locale.getDefault()));
+            LOGGER.info("success, requesting silent print: {}, at printer: {}", getFile(), printJob.getPrintService());
+            printJob.print(printable, attrs);
+            printCompleted = watcher.waitForDone();
+
+        } catch (final IOException e) {
+            LOGGER.error("error, invalid {} contents - verify http/application login details", getFile());
+            throw e;
+        } finally {
+            if (document != null) {
+                document.close();
+            }
+        }
+        return new PrintOperationResult(getFile(), printCompleted);
     }
 
     /**
-     * Checks if is done.
-     *
-     * @return true, if is done
+     * Execute ex.
+     * 
+     * @param context
+     *            the context
+     * @return the operation result
+     * @throws Exception
+     *             the exception
      */
-    public boolean isDone() {
+    public OperationResult executeEx(Context context) throws Exception {
 
-      return _done;
-    }
+        final PrintContext printContext = (PrintContext) context;
 
-    /**
-     * Checks if is prints the job completed.
-     *
-     * @return true, if is prints the job completed
-     */
-    public boolean isPrintJobCompleted() {
+        PDDocument document = null;
+        final boolean printCompleted = false;
+        try {
+            LOGGER.debug("load file: {} ", getFile());
+            document = PDDocument.load(getFile());
+            final PrinterJob printJob = PrinterJob.getPrinterJob();
+            printJob.setJobName(printContext.getFile());
+            document.print(printJob);
 
-      return _printJobCompleted;
-    }
-
-    /**
-     * Sets the done.
-     *
-     * @param done the new done
-     */
-    public void setDone(boolean done) {
-
-      _done = done;
-    }
-
-    /**
-     * Sets the prints the job completed.
-     *
-     * @param printJobCompleted the new prints the job completed
-     */
-    public void setPrintJobCompleted(boolean printJobCompleted) {
-
-      _printJobCompleted = printJobCompleted;
-    }
-
-    /**
-     * Wait for done.
-     *
-     * @return true, if successful
-     */
-    public synchronized boolean waitForDone() {
-
-      try {
-        while (!isDone()) {
-          wait();
+        } catch (final IOException e) {
+            LOGGER.error("error, invalid {} contents - verify http/application login details.", getFile());
+            throw e;
+        } finally {
+            if (document != null) {
+                document.close();
+            }
         }
-
-      } catch (final InterruptedException e) {
-      }
-      return isPrintJobCompleted();
+        return new PrintOperationResult(getFile(), printCompleted);
     }
-  }
 
-  /**
-   * The Constant logger.
-   */
-  final static Logger logger = LoggerFactory.getLogger(PrintOperation.class);
+    /**
+     * Gets the file.
+     * 
+     * @return the file
+     */
+    public String getFile() {
 
-  /**
-   * The file.
-   */
-  private String _file;
-
-  /**
-   * _execute.
-   *
-   * @param context the context
-   * @return the operation result
-   * @throws Exception the exception
-   */
-  public OperationResult _execute(Context context) throws Exception {
-
-    final PrintContext printContext = (PrintContext) context;
-
-    PDDocument document = null;
-    final boolean printCompleted = false;
-    try {
-      logger.debug("load: {}", getFile());
-      document = PDDocument.load(getFile());
-      final PrinterJob printJob = PrinterJob.getPrinterJob();
-      printJob.setJobName(printContext.getFile());
-      document.print(printJob);
-
-    } catch (final IOException e) {
-      logger.error("error, invalid {} contents - verify http/application login details...", getFile());
-      throw e;
-    } finally {
-      if (document != null) {
-        document.close();
-      }
+        return file;
     }
-    return new PrintOperationResult(getFile(), printCompleted);
-  }
 
-  /*
-   * (non-Javadoc)
-   * @see
-   * com.xtradesoft.dlp.impl.DLPOperation#execute(com.xtradesoft.dlp.base.
-   * Context)
-   */
-  @Override
-  public OperationResult execute(Context context) throws Exception {
+    /**
+     * Sets the file.
+     * 
+     * @param file
+     *            the new file
+     */
+    public void setFile(String file) {
 
-    if (null != System.getProperty("ShowPrintDialog")) {
-      return _execute(context);
+        this.file = file;
     }
-    final PrintContext printContext = (PrintContext) context;
 
-    PDDocument document = null;
-    boolean printCompleted = false;
-    try {
-      logger.debug("load: {}", getFile());
-      document = PDDocument.load(getFile());
-      final SimpleDoc printable = new SimpleDoc(document, DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
-      final DocPrintJob printJob = printContext.getService().createPrintJob();
-      final PrintJobWatcher watcher = new PrintJobWatcher(printJob);
-      final PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
-      attrs.add(new JobName(getFile(), Locale.getDefault()));
-      logger.info("success, requesting silent print: {}, at printer: {}", getFile(), printJob.getPrintService());
-      printJob.print(printable, attrs);
-      printCompleted = watcher.waitForDone();
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.impl.DLPOperation#toString()
+     */
+    @Override
+    public String toString() {
 
-    } catch (final IOException e) {
-      logger.error("error, invalid {} contents - verify http/application login details...", getFile());
-      throw e;
-    } finally {
-      if (document != null) {
-        document.close();
-      }
+        return String.format("PrintOperation: {file: %s, %s}", file, super.toString());
+
     }
-    return new PrintOperationResult(getFile(), printCompleted);
-  }
-
-  /**
-   * Gets the file.
-   *
-   * @return the file
-   */
-  public String getFile() {
-
-    return _file;
-  }
-
-  /**
-   * Sets the file.
-   *
-   * @param file the new file
-   */
-  public void setFile(String file) {
-
-    _file = file;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.impl.DLPOperation#toString()
-   */
-  @Override
-  public String toString() {
-
-    return String.format("PrintOperation: {file: %s, %s}", _file, super.toString());
-
-  }
 }

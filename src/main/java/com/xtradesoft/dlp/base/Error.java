@@ -10,14 +10,15 @@ package com.xtradesoft.dlp.base;
 @SuppressWarnings("serial")
 public class Error extends Exception {
 
-  /**
-   * Instantiates a new Error.
-   *
-   * @param inner the inner
-   */
-  public Error(Throwable inner) {
+    /**
+     * Instantiates a new Error.
+     * 
+     * @param inner
+     *            the inner
+     */
+    public Error(Throwable inner) {
 
-    super(inner);
-  }
+        super(inner);
+    }
 
 }

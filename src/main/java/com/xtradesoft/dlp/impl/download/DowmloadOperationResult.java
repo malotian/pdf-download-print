@@ -13,36 +13,54 @@ import com.xtradesoft.dlp.impl.DLPOperationResult;
  */
 public class DowmloadOperationResult extends DLPOperationResult {
 
-  /**
-   * The file.
-   */
-  public String file;
+    /** The file. */
+    private final String file;
 
-  /**
-   * The url.
-   */
-  public URL url;
+    /** The url. */
+    private final URL url;
 
-  /**
-   * Instantiates a new DowmloadOperationResult.
-   *
-   * @param url  the url
-   * @param file the file
-   */
-  DowmloadOperationResult(URL url, String file) {
+    /**
+     * Instantiates a new DowmloadOperationResult.
+     * 
+     * @param url
+     *            the url
+     * @param file
+     *            the file
+     */
+    DowmloadOperationResult(URL url, String file) {
 
-    this.url = url;
-    this.file = file;
-  }
+        this.url = url;
+        this.file = file;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.impl.DLPOperationResult#toString()
-   */
-  @Override
-  public String toString() {
+    /**
+     * File.
+     * 
+     * @return the string
+     */
+    public String file() {
 
-    return String.format("DowmloadOperationResult: {url:%s, file:%s,  %s}", url, file, super.toString());
-  }
+        return file;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.impl.DLPOperationResult#toString()
+     */
+    @Override
+    public String toString() {
+
+        return String.format("DowmloadOperationResult: {url:%s, file:%s,  %s}", url, file, super.toString());
+    }
+
+    /**
+     * Url.
+     * 
+     * @return the url
+     */
+    public URL url() {
+
+        return url;
+    }
 
 }

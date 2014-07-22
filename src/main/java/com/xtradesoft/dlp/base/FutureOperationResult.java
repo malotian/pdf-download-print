@@ -11,77 +11,76 @@ import java.util.concurrent.Future;
  */
 public class FutureOperationResult extends OperationError<Error> {
 
-  /**
-   * The future.
-   */
-  Future<OperationResult> _future;
+    /** The future. */
+    Future<OperationResult> future;
 
-  /**
-   * The operation.
-   */
-  Operation _operation;
+    /** The operation. */
+    Operation operation;
 
-  /**
-   * Instantiates a new FutureOperationResult.
-   *
-   * @param error the error
-   */
-  FutureOperationResult(Error error) {
+    /**
+     * Instantiates a new FutureOperationResult.
+     * 
+     * @param error
+     *            the error
+     */
+    FutureOperationResult(Error error) {
 
-    super(error);
-  }
+        super(error);
+    }
 
-  /**
-   * Instantiates a new FutureOperationResult.
-   *
-   * @param future the future
-   */
-  FutureOperationResult(Future<OperationResult> future) {
+    /**
+     * Instantiates a new FutureOperationResult.
+     * 
+     * @param future
+     *            the future
+     */
+    FutureOperationResult(Future<OperationResult> future) {
 
-    _future = future;
-  }
+        this.future = future;
+    }
 
-  /**
-   * Future.
-   *
-   * @return the future
-   */
-  public Future<OperationResult> future() {
+    /**
+     * Future.
+     * 
+     * @return the future
+     */
+    public Future<OperationResult> future() {
 
-    return _future;
-  }
+        return future;
+    }
 
-  /**
-   * Result of.
-   *
-   * @return the operation
-   */
-  public Operation resultOf() {
+    /**
+     * Result of.
+     * 
+     * @return the operation
+     */
+    public Operation resultOf() {
 
-    return _operation;
-  }
+        return operation;
+    }
 
-  /**
-   * Sets the.
-   *
-   * @param operation the operation
-   * @return the future operation result
-   */
-  public FutureOperationResult set(Operation operation) {
+    /**
+     * Sets the.
+     * 
+     * @param operation
+     *            the operation
+     * @return the future operation result
+     */
+    public FutureOperationResult set(Operation operation) {
 
-    _operation = operation;
-    return this;
-  }
+        this.operation = operation;
+        return this;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see com.xtradesoft.dlp.base.OperationError#toString()
-   */
-  @Override
-  public String toString() {
+    /*
+     * (non-Javadoc)
+     * @see com.xtradesoft.dlp.base.OperationError#toString()
+     */
+    @Override
+    public String toString() {
 
-    return String.format("FutureOperationResult {%s, %s}", resultOf(), super.toString());
+        return String.format("FutureOperationResult {%s, %s}", resultOf(), super.toString());
 
-  }
+    }
 
 }

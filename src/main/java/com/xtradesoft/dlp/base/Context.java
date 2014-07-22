@@ -9,38 +9,37 @@ package com.xtradesoft.dlp.base;
  */
 public abstract class Context {
 
-  /**
-   * The next.
-   */
-  Context _next;
+    /** The next. */
+    Context next;
 
-  /**
-   * Checks for next.
-   *
-   * @return true, if successful
-   */
-  public boolean hasNext() {
+    /**
+     * Checks for next.
+     * 
+     * @return true, if successful
+     */
+    public boolean hasNext() {
 
-    return (_next != null);
-  }
+        return next != null;
+    }
 
-  /**
-   * Next.
-   *
-   * @return the context
-   */
-  public Context next() {
+    /**
+     * Next.
+     * 
+     * @return the context
+     */
+    public Context next() {
 
-    return _next;
-  }
+        return next;
+    }
 
-  /**
-   * Next.
-   *
-   * @param next the next
-   */
-  public void next(Context next) {
+    /**
+     * Next.
+     * 
+     * @param next
+     *            the next
+     */
+    public void next(Context next) {
 
-    _next = next;
-  }
+        this.next = next;
+    }
 }

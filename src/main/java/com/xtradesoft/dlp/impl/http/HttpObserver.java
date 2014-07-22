@@ -12,12 +12,13 @@ import java.util.Map;
  */
 public interface HttpObserver {
 
-  /**
-   * This method is called when information about an Http which was previously
-   * requested using an asynchronous interface becomes available.
-   *
-   * @param httpInput the http input
-   * @return true, if notify
-   */
-  boolean notify(Map<String, String> httpInput);
+    /**
+     * This method is called when information about an Http which was previously
+     * requested using an asynchronous interface becomes available.
+     * 
+     * @param httpInput
+     *            the http input
+     * @return true, if notify
+     */
+    boolean notify(Map<String, String> httpInput);
 }

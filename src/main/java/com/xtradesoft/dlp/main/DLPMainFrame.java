@@ -35,265 +35,273 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class DLPMainFrame extends JFrame {
 
-  /**
-   * The Class DLPChildFrame.
-   */
-  public class DLPChildFrame extends JInternalFrame {
-
     /**
-     * The Constant openFrameCount.
+     * The Class DLPChildFrame.
      */
-    static final int openFrameCount = 0;
+    public class DLPChildFrame extends JInternalFrame {
 
-    /**
-     * The Constant yOffset.
-     */
-    static final int xOffset = 30, yOffset = 30;
+        /**
+         * Instantiates a new DLPChildFrame.
+         * 
+         * @param title
+         *            the title
+         */
+        public DLPChildFrame(String title) {
 
-    /**
-     * Instantiates a new DLPChildFrame.
-     *
-     * @param title the title
-     */
-    public DLPChildFrame(String title) {
+            super(title, true, false, true, true);
 
-      super(title, true, false, true, true);
-
-      setSize(300, 300);
-
-      setLocation(xOffset * openFrameCount, yOffset * openFrameCount);
-    }
-
-  }
-
-  /**
-   * The Class SystemTrayAdapter.
-   *
-   * @param <T> the generic type
-   */
-  public class SystemTrayAdapter<T extends JFrame> {
-
-    /**
-     * The frame.
-     */
-    private final JFrame _frame;
-
-    /**
-     * Instantiates a new SystemTrayAdapter.
-     *
-     * @param frame the frame
-     */
-    SystemTrayAdapter(T frame) {
-
-      _frame = frame;
-      _adapt();
-    }
-
-    /**
-     * _adapt.
-     */
-    void _adapt() {
-
-      if (!SystemTray.isSupported()) {
-        logger.error("system tray is not supported");
-      }
-
-      final PopupMenu menu = new PopupMenu();
-
-      final MenuItem showItem = new MenuItem("Show");
-      menu.add(showItem);
-
-      final MenuItem exitItem = new MenuItem("Exit");
-      menu.add(exitItem);
-
-      final URL imageURL = SystemTrayAdapter.class.getResource("/images/app-icon.png");
-
-      if (imageURL == null) {
-        logger.error("/images/app-icon.png found, skip systray installation");
-        return;
-      }
-
-      final Image image = new ImageIcon(imageURL).getImage();
-      final TrayIcon icon = new TrayIcon(image, "pdf-download-print", menu);
-
-      icon.setImageAutoSize(true);
-      _frame.setIconImage(image);
-
-      icon.addActionListener(new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-
-          _frame.setVisible(true);
-          _frame.setExtendedState(Frame.NORMAL);
-          SystemTray.getSystemTray().remove(icon);
+            setSize(300, 300);
         }
 
-      });
-
-      showItem.addActionListener(new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-
-          _frame.setVisible(true);
-          _frame.setExtendedState(Frame.NORMAL);
-          SystemTray.getSystemTray().remove(icon);
-        }
-      });
-
-      exitItem.addActionListener(new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-
-          if (null == _windowListner) {
-            return;
-          }
-
-          _windowListner.windowClosing(new WindowEvent(_frame, WindowEvent.WINDOW_CLOSING));
-          dispose();
-          _windowListner.windowClosed(new WindowEvent(_frame, WindowEvent.WINDOW_CLOSED));
-        }
-      });
-
-      _frame.addWindowListener(new WindowAdapter() {
-
-        @Override
-        public void windowIconified(WindowEvent we) {
-
-          _frame.setVisible(false);
-          try {
-            SystemTray.getSystemTray().add(icon);
-          } catch (final AWTException e) {
-            logger.error(e.getMessage(), e);
-          }
-        }
-
-      });
-
-      _frame.setState(Frame.ICONIFIED);
-    }
-  }
-
-  /**
-   * The Constant logger.
-   */
-  final static Logger logger = LoggerFactory.getLogger(DLPMainFrame.class);
-
-  static {
-    JFrame.setDefaultLookAndFeelDecorated(true);
-  }
-
-  /**
-   * The desktop.
-   */
-  JDesktopPane _desktop;
-
-  /**
-   * The window listner.
-   */
-  private WindowAdapter _windowListner;
-
-  /**
-   * Instantiates a new DLPMainFrame.
-   */
-  public DLPMainFrame() {
-
-    super("pdf-download-print");
-    initialize();
-  }
-
-  /**
-   * Instantiates a new DLPMainFrame.
-   *
-   * @param windowListner the window listner
-   */
-  public DLPMainFrame(WindowAdapter windowListner) {
-
-    super("pdf-download-print");
-    addWindowListener(_windowListner = windowListner);
-    initialize();
-  }
-
-  /**
-   * Adds the child.
-   *
-   * @param child the child
-   * @param title the title
-   */
-  public void addChild(JComponent child, String title) {
-
-    final DLPChildFrame frame = new DLPChildFrame(title);
-    frame.pack();
-
-    frame.setSize(300, 300);
-    frame.add(child);
-
-    frame.setVisible(true);
-    _desktop.add(frame);
-
-    try {
-      frame.setSelected(true);
-
-    } catch (final java.beans.PropertyVetoException e) {
     }
 
-    tile();
-  }
+    /**
+     * The Class SystemTrayAdapter.
+     * 
+     * @param <T>
+     *            the generic type
+     */
+    public class SystemTrayAdapter<T extends JFrame> {
 
-  /**
-   * Initialize.
-   */
-  public void initialize() {
+        /** The frame. */
+        private final JFrame frame;
 
-    setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
-    setMaximumSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
-    setResizable(false);
+        /**
+         * Instantiates a new SystemTrayAdapter.
+         * 
+         * @param frame
+         *            the frame
+         */
+        SystemTrayAdapter(T frame) {
 
-    _desktop = new JDesktopPane();
-    setContentPane(_desktop);
+            this.frame = frame;
+            adapt();
+        }
 
-    _desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setVisible(true);
-  }
+        /**
+         * Adapt.
+         */
+        void adapt() {
 
-  /**
-   * Send to tray.
-   */
-  public void sendToTray() {
+            if (!SystemTray.isSupported()) {
+                LOGGER.error("system tray is not supported");
+                return;
+            }
 
-    new SystemTrayAdapter<DLPMainFrame>(this);
-  }
+            final PopupMenu menu = new PopupMenu();
 
-  /**
-   * Tile.
-   */
-  public void tile() {
+            final MenuItem showItem = new MenuItem("Show");
+            menu.add(showItem);
 
-    final JInternalFrame frames[] = _desktop.getAllFrames();
-    final Dimension frameSize = new Dimension(_desktop.getSize());
-    final int xShift = 0;
-    int yShift = 0;
-    if (frames.length > 0) {
-      frameSize.height /= frames.length;
-      yShift = frameSize.height;
+            final MenuItem exitItem = new MenuItem("Exit");
+            menu.add(exitItem);
+
+            final URL imageURL = SystemTrayAdapter.class.getResource("/images/app-icon.png");
+
+            final Image image = new ImageIcon(imageURL).getImage();
+            final TrayIcon icon = new TrayIcon(image, TITLE, menu);
+
+            icon.setImageAutoSize(true);
+            this.frame.setIconImage(image);
+
+            icon.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+
+                    SystemTrayAdapter.this.frame.setVisible(true);
+                    SystemTrayAdapter.this.frame.setExtendedState(Frame.NORMAL);
+                    SystemTray.getSystemTray().remove(icon);
+                }
+
+            });
+
+            showItem.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+
+                    SystemTrayAdapter.this.frame.setVisible(true);
+                    SystemTrayAdapter.this.frame.setExtendedState(Frame.NORMAL);
+                    SystemTray.getSystemTray().remove(icon);
+                }
+            });
+
+            exitItem.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+
+                    if (null == windowListner) {
+                        return;
+                    }
+
+                    windowListner.windowClosing(new WindowEvent(SystemTrayAdapter.this.frame,
+                            WindowEvent.WINDOW_CLOSING));
+
+                    windowListner
+                            .windowClosed(new WindowEvent(SystemTrayAdapter.this.frame, WindowEvent.WINDOW_CLOSED));
+
+                    SystemTray.getSystemTray().remove(icon);
+                    SystemTrayAdapter.this.frame.dispose();
+                }
+            });
+
+            this.frame.addWindowListener(new WindowAdapter() {
+
+                @Override
+                public void windowIconified(WindowEvent we) {
+
+                    SystemTrayAdapter.this.frame.setVisible(false);
+                    try {
+                        SystemTray.getSystemTray().add(icon);
+                    } catch (final AWTException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+
+            });
+
+            this.frame.setState(Frame.ICONIFIED);
+        }
     }
 
-    int x = 0, y = 0;
-    for (final JInternalFrame frame : frames) {
-      if (frame.isMaximum()) {
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DLPMainFrame.class);
+
+    /** The Constant TITLE. */
+    private static final String TITLE = "pdf-download-print";
+
+    static {
+        JFrame.setDefaultLookAndFeelDecorated(true);
+    }
+
+    /** The desktop. */
+    JDesktopPane desktop;
+
+    /** The window listner. */
+    private WindowAdapter windowListner;
+
+    /**
+     * Instantiates a new DLPMainFrame.
+     */
+    public DLPMainFrame() {
+
+        super(TITLE);
+        initialize();
+    }
+
+    /**
+     * Instantiates a new DLPMainFrame.
+     * 
+     * @param windowListner
+     *            the window listner
+     */
+    public DLPMainFrame(WindowAdapter windowListner) {
+
+        super(TITLE);
+        this.windowListner = windowListner;
+        addWindowListener(windowListner);
+        initialize();
+    }
+
+    /**
+     * Adds the child.
+     * 
+     * @param child
+     *            the child
+     * @param title
+     *            the title
+     */
+    public void addChild(JComponent child, String title) {
+
+        final DLPChildFrame childFrame = new DLPChildFrame(title);
+        childFrame.pack();
+
+        childFrame.setSize(300, 300);
+        childFrame.add(child);
+
+        childFrame.setVisible(true);
+        desktop.add(childFrame);
+
         try {
-          frame.setMaximum(false);
-        } catch (final PropertyVetoException pve) {
+            childFrame.setSelected(true);
+
+        } catch (final java.beans.PropertyVetoException e) {
+            LOGGER.error(e.getMessage(), e);
         }
-      }
-      frame.setSize(frameSize);
-      frame.setLocation(x, y);
-      x += xShift;
-      y += yShift;
+
+        tile();
     }
-  }
+
+    /**
+     * Initialize.
+     */
+    public void initialize() {
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
+        setMaximumSize(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().getSize());
+        setResizable(false);
+
+        desktop = new JDesktopPane();
+        setContentPane(desktop);
+
+        desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+
+        setVisible(true);
+    }
+
+    /**
+     * Send to tray.
+     */
+    public void sendToTray() {
+
+        new SystemTrayAdapter<DLPMainFrame>(this);
+    }
+
+    /**
+     * Tile.
+     */
+    public void diposeChilds() {
+
+        final JInternalFrame[] frames = desktop.getAllFrames();
+
+        for (JInternalFrame frame : frames) {
+            frame.dispose();
+        }
+
+    }
+
+    /**
+     * Tile.
+     */
+    public void tile() {
+
+        final JInternalFrame[] frames = desktop.getAllFrames();
+        final Dimension frameSize = new Dimension(desktop.getSize());
+        final int xShift = 0;
+        int yShift = 0;
+        if (frames.length > 0) {
+            frameSize.height /= frames.length;
+            yShift = frameSize.height;
+        }
+
+        int x = 0, y = 0;
+        for (final JInternalFrame frame : frames) {
+            if (frame.isMaximum()) {
+                try {
+                    frame.setMaximum(false);
+                } catch (final PropertyVetoException pve) {
+                    LOGGER.error(pve.getMessage(), pve);
+                }
+            }
+            frame.setSize(frameSize);
+            frame.setLocation(x, y);
+            x += xShift;
+            y += yShift;
+        }
+    }
 
 }

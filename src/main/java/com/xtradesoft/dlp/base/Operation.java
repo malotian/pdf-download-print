@@ -11,83 +11,80 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class Operation {
 
-  /**
-   * The Class UniqueIdGenerator.
-   */
-  static class UniqueIdGenerator {
-
     /**
-     * The counter.
+     * The Class UniqueIdGenerator.
      */
-    private final AtomicInteger counter = new AtomicInteger();
+    static class UniqueIdGenerator {
 
-    /**
-     * Next id.
-     *
-     * @return the string
-     */
-    public String nextId() {
+        /** The counter. */
+        private final AtomicInteger counter = new AtomicInteger();
 
-      return String.format("0x%09X", counter.incrementAndGet());
+        /**
+         * Next id.
+         * 
+         * @return the string
+         */
+        public String nextId() {
+
+            return String.format("0x%09X", counter.incrementAndGet());
+        }
     }
-  }
 
-  /**
-   * The id generator.
-   */
-  private static UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+    /** The id generator. */
+    private static UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
-  /**
-   * The id.
-   */
-  private String _id;
+    /** The id. */
+    private String id;
 
-  /**
-   * Instantiates a new Operation.
-   */
-  public Operation() {
+    /**
+     * Instantiates a new Operation.
+     */
+    public Operation() {
 
-    setID(idGenerator.nextId());
+        setID(idGenerator.nextId());
 
-  }
+    }
 
-  /**
-   * Execute.
-   *
-   * @param context the context
-   * @return the operation result
-   * @throws Exception the exception
-   */
-  public abstract OperationResult execute(Context context) throws Exception;
+    /**
+     * Execute.
+     * 
+     * @param context
+     *            the context
+     * @return the operation result
+     * @throws Exception
+     *             the exception
+     */
+    public abstract OperationResult execute(Context context) throws Exception;
 
-  /**
-   * Gets the id.
-   *
-   * @return the id
-   */
-  public String getID() {
+    /**
+     * Gets the id.
+     * 
+     * @return the id
+     */
+    public String getID() {
 
-    return _id;
-  }
+        return id;
+    }
 
-  /**
-   * Sets the id.
-   *
-   * @param id the new id
-   */
-  void setID(String id) {
+    /**
+     * Sets the id.
+     * 
+     * @param id
+     *            the new id
+     */
+    void setID(String id) {
 
-    _id = id;
-  }
+        this.id = id;
+    }
 
-  /*
-   * (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
 
-    return String.format("Operation: {ID: %s}", getID());
+        return String.format("Operation: {ID: %s}", getID());
 
-  }
+    }
 }

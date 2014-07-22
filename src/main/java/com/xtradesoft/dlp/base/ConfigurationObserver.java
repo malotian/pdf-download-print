@@ -10,11 +10,12 @@ package com.xtradesoft.dlp.base;
  */
 public interface ConfigurationObserver {
 
-  /**
-   * This method is called when information about an Configuration which was
-   * previously requested using an asynchronous interface becomes available.
-   *
-   * @param configuration the configuration
-   */
-  void notify(Configuration configuration);
+    /**
+     * This method is called when information about an Configuration which was
+     * previously requested using an asynchronous interface becomes available.
+     * 
+     * @param configuration
+     *            the configuration
+     */
+    void notify(Configuration configuration);
 }
