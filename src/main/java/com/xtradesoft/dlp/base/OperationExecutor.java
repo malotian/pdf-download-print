@@ -179,11 +179,6 @@ public abstract class OperationExecutor {
     /** The watch executor. */
     ScheduledExecutorService watchExecutor;
 
-    public Executor executor() {
-
-        return executorService;
-    }
-
     /**
      * Instantiates a new OperationExecutor.
      */
@@ -238,6 +233,16 @@ public abstract class OperationExecutor {
      *             the exception
      */
     public abstract OperationResult execute(Operation operation) throws Exception;
+
+    /**
+     * Executor.
+     * 
+     * @return the executor
+     */
+    public Executor executor() {
+
+        return executorService;
+    }
 
     /**
      * Gets the contextprovider.

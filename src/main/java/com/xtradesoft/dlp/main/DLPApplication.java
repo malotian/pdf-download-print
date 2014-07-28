@@ -194,6 +194,8 @@ public class DLPApplication implements ConfigurationObserver, DownloadObserver, 
         final PrintOperation operation = new PrintOperation();
         operation.setURL(result.url());
         operation.setFile(result.file());
+        final DownloadOperation dop = (DownloadOperation) result.resultOf();
+        operation.setLookupDefault(dop.shallLookupdefault());
         executor.submit(operation);
     }
 
@@ -206,8 +208,10 @@ public class DLPApplication implements ConfigurationObserver, DownloadObserver, 
 
         final String url = httpInput.get("print");
         LOGGER.info("received, download and print request for url: {}", url);
+
         try {
-            submit(new URL(url));
+            boolean lookupDefault = httpInput.containsKey("lookup") && httpInput.get("lookup").equalsIgnoreCase("default");
+            submit(new URL(url), lookupDefault);
         } catch (final MalformedURLException e) {
             LOGGER.error("no or invalid url: {}, error: {}", url, e);
             return false;
@@ -321,9 +325,10 @@ public class DLPApplication implements ConfigurationObserver, DownloadObserver, 
      *            the url
      * @return the future operation result
      */
-    public FutureOperationResult submit(URL url) {
+    public FutureOperationResult submit(URL url, boolean lookupDefault) {
 
         final DownloadOperation operation = new DownloadOperation(url);
+        operation.setLookupDefault(lookupDefault);
         operation.register(this);
         return submit(operation);
     }

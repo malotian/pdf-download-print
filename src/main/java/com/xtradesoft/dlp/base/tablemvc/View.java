@@ -50,7 +50,7 @@ public class View<T extends Model> extends JComponent {
             super(dm);
         }
 
-        /* 
+        /*
          * (non-Javadoc)
          * @see javax.swing.JTable#getScrollableTracksViewportWidth()
          */
@@ -61,9 +61,11 @@ public class View<T extends Model> extends JComponent {
                     : getPreferredSize().width < getParent().getWidth();
         }
 
-        /* 
+        /*
          * (non-Javadoc)
-         * @see javax.swing.JTable#prepareRenderer(javax.swing.table.TableCellRenderer, int, int)
+         * @see
+         * javax.swing.JTable#prepareRenderer(javax.swing.table.TableCellRenderer
+         * , int, int)
          */
         @Override
         public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -129,9 +131,11 @@ public class View<T extends Model> extends JComponent {
             });
         }
 
-        /* 
+        /*
          * (non-Javadoc)
-         * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+         * @see
+         * javax.swing.event.TableModelListener#tableChanged(javax.swing.event
+         * .TableModelEvent)
          */
         @Override
         public void tableChanged(TableModelEvent e) {

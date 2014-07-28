@@ -69,7 +69,7 @@ public class DLPContextProvider extends ContextProvider {
 
         final URL url = hint.getURL();
         final DownloadContext context = new DownloadContext(url);
-        final DLPConfiguration.Record record = lookup(url);
+        final DLPConfiguration.Record record = lookup(hint.lookupURL());
 
         LOGGER.debug("URL: {}", url);
         LOGGER.debug("HttpUsername: {}", record.HttpUsername());
@@ -159,7 +159,7 @@ public class DLPContextProvider extends ContextProvider {
 
         final URL url = hint.getURL();
         final PrintContext context = new PrintContext(url);
-        final DLPConfiguration.Record record = lookup(url);
+        final DLPConfiguration.Record record = lookup(hint.lookupURL());
 
         LOGGER.debug("URL: {}, file: {}", url, hint.getFile());
         LOGGER.debug("Printer: {}", record.Printer());

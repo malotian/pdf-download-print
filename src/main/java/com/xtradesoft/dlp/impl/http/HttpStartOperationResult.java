@@ -12,16 +12,19 @@ import com.xtradesoft.dlp.base.OperationResult;
  */
 public class HttpStartOperationResult extends OperationResult {
 
+    /** The server. */
+    final HttpServer server;
+
     /** The started. */
     boolean started;
-
-    final HttpServer server;
 
     /**
      * Instantiates a new HttpStartOperationResult.
      * 
      * @param started
      *            the started
+     * @param server
+     *            the server
      */
     HttpStartOperationResult(boolean started, HttpServer server) {
 

@@ -5,10 +5,13 @@
 package com.xtradesoft.dlp.impl.download;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Response;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +27,9 @@ public class DownloadOperation extends DLPOperation {
 
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadOperation.class);
+
+    /** The lookup default. */
+    boolean lookupDefault = false;
 
     /** The observer. */
     private DownloadObserver observer;
@@ -62,6 +68,7 @@ public class DownloadOperation extends DLPOperation {
 
         final File file = roller.roll(dlContext.getMaxBackUps());
         final DowmloadOperationResult result = new DowmloadOperationResult(dlContext.getURL(), file.getName());
+        result.set(this);
 
         LOGGER.debug("HttpGet: {}", dlContext.httpGet());
         dlContext.getExecutor().execute(dlContext.httpGet()).saveContent(file);
@@ -122,6 +129,35 @@ public class DownloadOperation extends DLPOperation {
     }
 
     /**
+     * Lookup url.
+     * 
+     * @return the url
+     */
+    public URL lookupURL() {
+
+        try {
+            final URIBuilder helper = new URIBuilder(getURL().toURI());
+            helper.removeQuery();
+
+            if (shallLookupdefault()) {
+                final String[] pathTokens = getURL().getPath().split("/");
+                if (lookupDefault && pathTokens.length >= 2) {
+                    helper.setPath("/" + pathTokens[1]);
+                }
+            }
+
+            return helper.build().toURL();
+
+        } catch (final URISyntaxException e) {
+            LOGGER.error("no or invalid url: {}, error: {}", getURL(), e);
+        } catch (final MalformedURLException e) {
+            LOGGER.error("no or invalid url: {}, error: {}", getURL(), e);
+        }
+
+        return null;
+    }
+
+    /**
      * Register.
      * 
      * @param observer
@@ -130,6 +166,29 @@ public class DownloadOperation extends DLPOperation {
     public void register(DownloadObserver observer) {
 
         this.observer = observer;
+    }
+
+    /**
+     * Sets the lookup default.
+     * 
+     * @param lookupDefault
+     *            the new lookup default
+     */
+    public void setLookupDefault(boolean lookupDefault) {
+
+        this.lookupDefault = lookupDefault;
+
+    }
+
+    /**
+     * Shall lookupdefault.
+     * 
+     * @return true, if successful
+     */
+    public boolean shallLookupdefault() {
+
+        return lookupDefault;
+
     }
 
     /*

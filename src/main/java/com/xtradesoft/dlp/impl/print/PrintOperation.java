@@ -6,6 +6,9 @@ package com.xtradesoft.dlp.impl.print;
 
 import java.awt.print.PrinterJob;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Locale;
 
 import javax.print.DocFlavor;
@@ -17,6 +20,7 @@ import javax.print.attribute.standard.JobName;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +69,11 @@ public class PrintOperation extends DLPOperation {
                 }
             }
 
-            /* 
+            /*
              * (non-Javadoc)
-             * @see javax.print.event.PrintJobAdapter#printJobCanceled(javax.print.event.PrintJobEvent)
+             * @see
+             * javax.print.event.PrintJobAdapter#printJobCanceled(javax.print
+             * .event.PrintJobEvent)
              */
             @Override
             public void printJobCanceled(PrintJobEvent pje) {
@@ -76,9 +82,11 @@ public class PrintOperation extends DLPOperation {
                 done();
             }
 
-            /* 
+            /*
              * (non-Javadoc)
-             * @see javax.print.event.PrintJobAdapter#printJobCompleted(javax.print.event.PrintJobEvent)
+             * @see
+             * javax.print.event.PrintJobAdapter#printJobCompleted(javax.print
+             * .event.PrintJobEvent)
              */
             @Override
             public void printJobCompleted(PrintJobEvent pje) {
@@ -88,9 +96,11 @@ public class PrintOperation extends DLPOperation {
                 done();
             }
 
-            /* 
+            /*
              * (non-Javadoc)
-             * @see javax.print.event.PrintJobAdapter#printJobFailed(javax.print.event.PrintJobEvent)
+             * @see
+             * javax.print.event.PrintJobAdapter#printJobFailed(javax.print.
+             * event.PrintJobEvent)
              */
             @Override
             public void printJobFailed(PrintJobEvent pje) {
@@ -99,9 +109,11 @@ public class PrintOperation extends DLPOperation {
                 done();
             }
 
-            /* 
+            /*
              * (non-Javadoc)
-             * @see javax.print.event.PrintJobAdapter#printJobNoMoreEvents(javax.print.event.PrintJobEvent)
+             * @see
+             * javax.print.event.PrintJobAdapter#printJobNoMoreEvents(javax.
+             * print.event.PrintJobEvent)
              */
             @Override
             public void printJobNoMoreEvents(PrintJobEvent pje) {
@@ -195,6 +207,9 @@ public class PrintOperation extends DLPOperation {
     /** The file. */
     private String file;
 
+    /** The lookup default. */
+    boolean lookupDefault = false;
+
     /*
      * (non-Javadoc)
      * @see
@@ -279,6 +294,35 @@ public class PrintOperation extends DLPOperation {
     }
 
     /**
+     * Lookup url.
+     * 
+     * @return the url
+     */
+    public URL lookupURL() {
+
+        try {
+            final URIBuilder helper = new URIBuilder(getURL().toURI());
+            helper.removeQuery();
+
+            if (shallLookupdefault()) {
+                final String[] pathTokens = getURL().getPath().split("/");
+                if (lookupDefault && pathTokens.length >= 2) {
+                    helper.setPath("/" + pathTokens[1]);
+                }
+            }
+
+            return helper.build().toURL();
+
+        } catch (final URISyntaxException e) {
+            LOGGER.error("no or invalid url: {}, error: {}", getURL(), e);
+        } catch (final MalformedURLException e) {
+            LOGGER.error("no or invalid url: {}, error: {}", getURL(), e);
+        }
+
+        return null;
+    }
+
+    /**
      * Sets the file.
      * 
      * @param file
@@ -287,6 +331,29 @@ public class PrintOperation extends DLPOperation {
     public void setFile(String file) {
 
         this.file = file;
+    }
+
+    /**
+     * Sets the lookup default.
+     * 
+     * @param lookupDefault
+     *            the new lookup default
+     */
+    public void setLookupDefault(boolean lookupDefault) {
+
+        this.lookupDefault = lookupDefault;
+
+    }
+
+    /**
+     * Shall lookupdefault.
+     * 
+     * @return true, if successful
+     */
+    boolean shallLookupdefault() {
+
+        return lookupDefault;
+
     }
 
     /*

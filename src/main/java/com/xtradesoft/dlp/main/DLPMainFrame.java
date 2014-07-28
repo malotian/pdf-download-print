@@ -235,6 +235,19 @@ public class DLPMainFrame extends JFrame {
     }
 
     /**
+     * Dipose childs.
+     */
+    public void diposeChilds() {
+
+        final JInternalFrame[] frames = desktop.getAllFrames();
+
+        for (final JInternalFrame frame : frames) {
+            frame.dispose();
+        }
+
+    }
+
+    /**
      * Initialize.
      */
     public void initialize() {
@@ -259,19 +272,6 @@ public class DLPMainFrame extends JFrame {
     public void sendToTray() {
 
         new SystemTrayAdapter<DLPMainFrame>(this);
-    }
-
-    /**
-     * Tile.
-     */
-    public void diposeChilds() {
-
-        final JInternalFrame[] frames = desktop.getAllFrames();
-
-        for (JInternalFrame frame : frames) {
-            frame.dispose();
-        }
-
     }
 
     /**

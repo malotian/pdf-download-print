@@ -23,7 +23,7 @@ public class LogAppender extends WriterAppender {
     /** The model. */
     private static Model model;
 
-    /** The Constant patternLayout. */
+    /** The Constant PATTERN_LAYOUT. */
     private static final String PATTERN_LAYOUT = "%5.5p|%d{HH:mm:ss}|%m";
 
     /**
