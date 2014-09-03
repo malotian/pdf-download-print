@@ -250,6 +250,7 @@ public class PrintOperation extends DLPOperation {
                 BufferedImage bi = page.convertToImage();
                 ImageIO.write(bi, "jpg", new File(imagePath));
                 count++;
+
                 FileInputStream fin = new FileInputStream(imagePath);
                 final SimpleDoc printable = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
                 final DocPrintJob printJob = printContext.getService().createPrintJob();
