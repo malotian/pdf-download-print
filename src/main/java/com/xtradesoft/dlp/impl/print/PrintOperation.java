@@ -246,10 +246,11 @@ public class PrintOperation extends DLPOperation {
             int count = 1;
 
             for (PDPage page : pages) {
-                String imagePath = imagesPath + "\\" + count + ".jpg";
+                String imagePath = imagesPath + "\\" + count + ".BMP";
                 BufferedImage bi = page.convertToImage();
-                ImageIO.write(bi, "jpg", new File(imagePath));
+                ImageIO.write(bi, "BMP", new File(imagePath));
                 count++;
+
                 FileInputStream fin = new FileInputStream(imagePath);
                 final SimpleDoc printable = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
                 final DocPrintJob printJob = printContext.getService().createPrintJob();
