@@ -6,8 +6,6 @@ package com.xtradesoft.dlp.impl.print;
 
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -15,19 +13,22 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
-import javax.imageio.ImageIO;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
+import javax.print.attribute.standard.PrintQuality;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -237,39 +238,43 @@ public class PrintOperation extends DLPOperation {
             LOGGER.debug("load: {}", getFile());
             document = PDDocument.load(getFile());
 
-            String imagesPath = getFile() + ".pages";
-            boolean status = new File(imagesPath).mkdir();
-            LOGGER.debug("images directory creation: {}, status {}", imagesPath, status);
-
             @SuppressWarnings("unchecked")
             List<PDPage> pages = document.getDocumentCatalog().getAllPages();
-            int count = 1;
 
+            PDDocument documentX = new PDDocument();
             for (PDPage page : pages) {
-                String imagePath = imagesPath + "\\" + count + ".BMP";
-                BufferedImage bi = page.convertToImage();
-                ImageIO.write(bi, "BMP", new File(imagePath));
-                count++;
 
-                FileInputStream fin = new FileInputStream(imagePath);
-                final SimpleDoc printable = new SimpleDoc(fin, DocFlavor.INPUT_STREAM.GIF, null);
-                final DocPrintJob printJob = printContext.getService().createPrintJob();
-                final PrintJobWatcher watcher = new PrintJobWatcher(printJob);
-                final PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
-                attrs.add(new JobName(getFile(), Locale.getDefault()));
-                LOGGER.info("success, requesting silent print: {}, at printer: {}", getFile(),
-                        printJob.getPrintService());
-                printJob.print(printable, attrs);
-                printCompleted = watcher.waitForDone();
+                PDPage pageX = new PDPage(page.getMediaBox());
+                documentX.addPage(pageX);
+
+                PDXObjectImage ximage = new PDPixelMap(documentX,
+                        page.convertToImage(BufferedImage.TYPE_3BYTE_BGR, 288));
+                PDPageContentStream contentStream = new PDPageContentStream(documentX, pageX, true, false);
+                contentStream.drawXObject(ximage, 0, 0, page.getMediaBox().getWidth(), page.getMediaBox().getHeight());
+                contentStream.close();
             }
 
+            final SimpleDoc printable = new SimpleDoc(documentX, DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
+            final DocPrintJob printJob = printContext.getService().createPrintJob();
+            final PrintJobWatcher watcher = new PrintJobWatcher(printJob);
+            final PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
+            attrs.add(new JobName(getFile(), Locale.getDefault()));
+            attrs.add(PrintQuality.HIGH);
+            LOGGER.info("success, requesting silent print: {}, at printer: {}", getFile(), printJob.getPrintService());
+            printJob.print(printable, attrs);
+            printCompleted = watcher.waitForDone();
+
+            documentX.close();
+
         } catch (final IOException e) {
+            e.printStackTrace();
             LOGGER.error("error, invalid {} contents - verify http/application login details", getFile());
             throw e;
         } finally {
             if (document != null) {
                 document.close();
             }
+
         }
         return new PrintOperationResult(getFile(), printCompleted);
     }
