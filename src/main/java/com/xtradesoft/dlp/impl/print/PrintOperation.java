@@ -4,31 +4,22 @@
 
 package com.xtradesoft.dlp.impl.print;
 
-import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Locale;
 
-import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
-import javax.print.SimpleDoc;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.print.attribute.standard.PrintQuality;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
+import org.apache.pdfbox.printing.Orientation;
+import org.apache.pdfbox.printing.PDFPrinter;
+import org.apache.pdfbox.printing.Scaling;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,61 +215,38 @@ public class PrintOperation extends DLPOperation {
      * Context)
      */
     @Override
-    public OperationResult execute(Context context) throws Exception {
+	public OperationResult execute(Context context) throws Exception {
 
-        if (null != System.getProperty("ShowPrintDialog")) {
-            return executeEx(context);
-        }
+		if (null != System.getProperty("ShowPrintDialog")) {
+			return executeEx(context);
+		}
 
-        final PrintContext printContext = (PrintContext) context;
+		final PrintContext printContext = (PrintContext) context;
 
-        PDDocument document = null;
-        boolean printCompleted = false;
-        try {
-            LOGGER.debug("load: {}", getFile());
-            document = PDDocument.load(getFile());
+		PDDocument document = null;
+		boolean printCompleted = false;
+		try {
+			LOGGER.debug("load: {}", getFile());
+			document = PDDocument.load(new File(getFile()));
+			PrinterJob printerJob = PrinterJob.getPrinterJob();
+			printerJob.setPrintService(printContext.getService());
+			PDFPrinter pdfPrinter = new PDFPrinter(document, printerJob, Scaling.SCALE_TO_FIT, Orientation.AUTO, null, false, 0.0F);
+			pdfPrinter.silentPrint();
 
-            @SuppressWarnings("unchecked")
-            List<PDPage> pages = document.getDocumentCatalog().getAllPages();
+		} catch (final IOException e) {
+			e.printStackTrace();
+			LOGGER.error(
+					"error, invalid {} contents - verify http/application login details",
+					getFile());
+			throw e;
+		} finally {
+			if (document != null) {
+				document.close();
+			}
 
-            PDDocument documentX = new PDDocument();
-            for (PDPage page : pages) {
-
-                PDPage pageX = new PDPage(page.getMediaBox());
-                documentX.addPage(pageX);
-
-                PDXObjectImage ximage = new PDPixelMap(documentX,
-                        page.convertToImage(BufferedImage.TYPE_3BYTE_BGR, 288));
-                PDPageContentStream contentStream = new PDPageContentStream(documentX, pageX, true, false);
-                contentStream.drawXObject(ximage, 0, 0, page.getMediaBox().getWidth(), page.getMediaBox().getHeight());
-                contentStream.close();
-            }
-
-            final SimpleDoc printable = new SimpleDoc(documentX, DocFlavor.SERVICE_FORMATTED.PAGEABLE, null);
-            final DocPrintJob printJob = printContext.getService().createPrintJob();
-            final PrintJobWatcher watcher = new PrintJobWatcher(printJob);
-            final PrintRequestAttributeSet attrs = new HashPrintRequestAttributeSet();
-            attrs.add(new JobName(getFile(), Locale.getDefault()));
-            attrs.add(PrintQuality.HIGH);
-            LOGGER.info("success, requesting silent print: {}, at printer: {}", getFile(), printJob.getPrintService());
-            printJob.print(printable, attrs);
-            printCompleted = watcher.waitForDone();
-
-            documentX.close();
-
-        } catch (final IOException e) {
-            e.printStackTrace();
-            LOGGER.error("error, invalid {} contents - verify http/application login details", getFile());
-            throw e;
-        } finally {
-            if (document != null) {
-                document.close();
-            }
-
-        }
-        return new PrintOperationResult(getFile(), printCompleted);
-    }
-
+		}
+		return new PrintOperationResult(getFile(), printCompleted);
+	}
     /**
      * Execute ex.
      * 
@@ -296,10 +264,11 @@ public class PrintOperation extends DLPOperation {
         final boolean printCompleted = false;
         try {
             LOGGER.debug("load file: {} ", getFile());
-            document = PDDocument.load(getFile());
+            document = PDDocument.load(new File(getFile()));
             final PrinterJob printJob = PrinterJob.getPrinterJob();
             printJob.setJobName(printContext.getFile());
-            document.print(printJob);
+            PDFPrinter pdfPrinter = new PDFPrinter(document);
+            pdfPrinter.print(printJob);
 
         } catch (final IOException e) {
             LOGGER.error("error, invalid {} contents - verify http/application login details.", getFile());
@@ -395,4 +364,60 @@ public class PrintOperation extends DLPOperation {
         return String.format("PrintOperation: {file: %s, %s}", file, super.toString());
 
     }
+    
+//    /**
+//     * Converts a given page range of a PDF document to bitmap images.
+//     * @param document the PDF document
+//     * @param folder 
+//     * @param imageFormat the target format (ex. "png")
+//     * @param outputPrefix used to construct the filename for the individual images
+//     * @return true if the images were produced, false if there was an error
+//     * @throws IOException if an I/O error occurs
+//     * @throws PdfToFlashException 
+//     */
+//    protected List<String> writeImages(PDDocument document, File folder, String imageFormat, String outputPrefix) throws IOException, PdfToFlashException
+//    {
+//        return writeImages(document, folder, imageFormat, "", 1, Integer.MAX_VALUE, outputPrefix, BufferedImage.TYPE_INT_RGB, 96, 1.0f);
+//    }
+//    
+//    /**
+//     * Converts a given page range of a PDF document to bitmap images.
+//     * @param document the PDF document
+//     * @param folder 
+//     * @param imageFormat the target format (ex. "png")
+//     * @param password the password (needed if the PDF is encrypted)
+//     * @param startPage the start page (1 is the first page)
+//     * @param endPage the end page (set to Integer.MAX_VALUE for all pages)
+//     * @param outputPrefix used to construct the filename for the individual images
+//     * @param imageType the image type (see {@link BufferedImage}.TYPE_*)
+//     * @param resolution the resolution in dpi (dots per inch)
+//     * @param quality the image compression quality (0 < quality < 1.0f).
+//     * @return true if the images were produced, false if there was an error
+//     * @throws IOException if an I/O error occurs
+//     * @throws PdfToFlashException 
+//     */
+//    protected List<String> writeImages(PDDocument document, File folder, String imageFormat, String password, int startPage, int endPage, String outputPrefix, int imageType, int resolution, float quality) throws IOException, PdfToFlashException
+//    {
+//        List<String> fileNames = new ArrayList<String>();
+//        
+//        List pages = document.getDocumentCatalog().getAllPages();
+//        int digitCount = Integer.toString(pages.size()).length();
+//        String format = "%0" + digitCount + "d." + imageFormat;
+//        for (int i = startPage - 1; i < endPage && i < pages.size(); i++)
+//        {
+//            PDPage page = (PDPage) pages.get(i);
+//            BufferedImage image = page.convertToImage(imageType, resolution);
+//            String fileName = outputPrefix + String.format(format, i + 1, imageFormat);
+//            fileNames.add(fileName);
+//            
+//			boolean foundWriter = ImageIOUtil.writeImage(image, imageFormat, new FileOutputStream(fileName), resolution, quality);
+//            
+//            if (!foundWriter)
+//            {
+//                throw new RuntimeException("No writer found for format '" + imageFormat + "'");
+//            }
+//        }
+//        
+//        return fileNames;
+//    }    
 }
